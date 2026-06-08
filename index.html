@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -213,7 +212,7 @@ function Splash({onDone,logoUrl}){
       </div>
       <div style={{marginTop:10,opacity:ph>=3?1:0,fontSize:14,letterSpacing:"0.35em",color:C.goldBright,fontFamily:"'Oswald',sans-serif",fontWeight:700}}>THE HERD</div>
       <div style={{width:ph>=3?180:0,height:1,background:"linear-gradient(to right,transparent,"+C.gold+",transparent)",marginTop:14,marginBottom:14,transition:"width 0.6s ease"}}/>
-      <div style={{opacity:ph>=3?1:0,transition:"opacity 0.6s ease",fontSize:12,color:C.offWhite,fontFamily:"'Oswald',sans-serif",fontStyle:"italic",letterSpacing:"0.15em"}}>"BUILT IN BENTON"</div>
+      <div style={{opacity:ph>=3?1:0,transition:"opacity 0.6s ease",fontSize:12,color:C.offWhite,fontFamily:"'Oswald',sans-serif",fontStyle:"italic",letterSpacing:"0.15em"}}>BUILT IN BENTON</div>
       {ph>=3&&<div style={{position:"absolute",bottom:60,display:"flex",gap:8}}>{[0,1,2].map(i=><div key={i} style={{width:6,height:6,borderRadius:"50%",background:C.goldBright,animation:"pulse 1.2s ease "+i*0.2+"s infinite"}}/>)}</div>}
     </div>
   </div>;
@@ -649,7 +648,7 @@ function HomeTab({athletes,meets,favIds,onOpenSelector,logoUrl,results,onViewAth
       <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(to right,"+C.goldDim+","+C.goldBright+","+C.goldDim+")"}}/>
       <div style={{fontSize:9,color:C.goldDim,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.4em",marginBottom:4}}>FALL 2026</div>
       <div style={{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,lineHeight:1}}>THE HERD</div>
-      <div style={{fontSize:11,color:C.gold,fontFamily:"'Oswald',sans-serif",fontStyle:"italic",marginTop:5,letterSpacing:"0.15em"}}>"BUILT IN BENTON"</div>
+      <div style={{fontSize:11,color:C.gold,fontFamily:"'Oswald',sans-serif",fontStyle:"italic",marginTop:5,letterSpacing:"0.15em"}}>BUILT IN BENTON</div>
     </div>
     <div style={{padding:"14px 14px"}}>
       {/* MY ATHLETES section */}
@@ -1229,3 +1228,4 @@ ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(
 </script>
 </body>
 </html>
+
