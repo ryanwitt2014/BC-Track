@@ -929,41 +929,100 @@ function AthleteProfile(props){
 }
 
 
+function useDaysUntil(dateStr){
+  if(!dateStr) return null;
+  var today=new Date(); today.setHours(0,0,0,0);
+  var meet=new Date(dateStr); meet.setHours(0,0,0,0);
+  var diff=Math.round((meet-today)/(1000*60*60*24));
+  return diff;
+}
+
+function MeetWeatherBadge(props){
+  var city=props.city; var date=props.date;
+  var weather=useWeather(city,date);
+  var R=React.createElement;
+  if(!weather||!city) return null;
+  return R("div",{style:{display:"flex",alignItems:"center",gap:6,padding:"5px 10px",background:C.subtle,borderRadius:8,marginTop:8}},
+    R(WeatherIcon,{icon:weather.icon,size:20}),
+    R("div",null,
+      R("div",{style:{fontSize:12,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},weather.high+"F / "+weather.low+"F"),
+      R("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",textTransform:"capitalize"}},weather.desc)
+    ),
+    R("div",{style:{marginLeft:"auto",fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif"}},city)
+  );
+}
+
 function ScheduleTab(props){
   var meets=props.meets;
-  return React.createElement("div",{style:{padding:"20px 16px"}},
-    React.createElement("div",{style:{marginBottom:18}},
-      React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em"}},"FALL 2026"),
-      React.createElement("div",{style:{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"SCHEDULE")
+  var R=React.createElement;
+  var today=new Date(); today.setHours(0,0,0,0);
+  var suffix=function(n){return n===1?"st":n===2?"nd":n===3?"rd":"th";};
+
+  // Find the single next/upcoming meet for the countdown hero
+  var nextMeet=meets.filter(function(m){return m.status==="next";  })[0] || meets.filter(function(m){return m.status==="upcoming";})[0];
+  var daysUntilNext=nextMeet?useDaysUntil(nextMeet.date):null;
+
+  return R("div",{style:{padding:"20px 16px"}},
+    R("div",{style:{marginBottom:14}},
+      R("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em"}},"FALL 2026"),
+      R("div",{style:{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"SCHEDULE")
     ),
+
+    // Countdown hero for next meet
+    nextMeet&&daysUntilNext!==null&&R("div",{style:{background:"linear-gradient(135deg,#180E00,"+C.card+")",border:"1px solid "+C.goldBright+"55",borderRadius:16,padding:16,marginBottom:16,position:"relative",overflow:"hidden"}},
+      R("div",{style:{position:"absolute",left:0,top:0,bottom:0,width:3,background:C.goldBright}}),
+      R("div",{style:{display:"flex",alignItems:"center",gap:12,paddingLeft:8}},
+        R("div",{style:{textAlign:"center",minWidth:56}},
+          R("div",{style:{fontSize:42,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright,lineHeight:1}},daysUntilNext<=0?"TODAY":String(daysUntilNext)),
+          daysUntilNext>0&&R("div",{style:{fontSize:9,color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em"}},"DAYS")
+        ),
+        R("div",{style:{width:1,height:50,background:C.cardBorder}}),
+        R("div",{style:{flex:1}},
+          R("div",{style:{fontSize:9,color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.3em",marginBottom:4}},"NEXT MEET"),
+          R("div",{style:{fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},nextMeet.name),
+          R("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:2}},nextMeet.date),
+          nextMeet.bus_time&&R("div",{style:{fontSize:11,color:C.goldBright,fontFamily:"'Oswald',sans-serif",marginTop:2}},"Bus: "+nextMeet.bus_time)
+        )
+      ),
+      R(MeetWeatherBadge,{city:nextMeet.city,date:nextMeet.date})
+    ),
+
     meets.map(function(m){
       var isNext=m.status==="next",isDone=m.status==="done";
+      var daysUntil=useDaysUntil(m.date);
       var cc=m.course_type==="fast"?C.greenLight:m.course_type==="slow"?C.red:C.muted;
-      var suffix=function(n){return n===1?"st":n===2?"nd":n===3?"rd":"th";};
-      return React.createElement("div",{key:m.id,style:{background:isNext?"linear-gradient(135deg,#180E00,"+C.card+")":C.card,border:"1px solid "+(isNext?C.goldBright+"55":C.cardBorder),borderRadius:14,padding:16,marginBottom:12,opacity:isDone?0.7:1,position:"relative",overflow:"hidden"}},
-        isNext&&React.createElement("div",{style:{position:"absolute",left:0,top:0,bottom:0,width:3,background:C.goldBright}}),
-        isDone&&React.createElement("div",{style:{position:"absolute",left:0,top:0,bottom:0,width:3,background:C.muted}}),
-        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}},
-          React.createElement("div",null,
-            React.createElement("div",{style:{fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:isNext?C.goldBright:isDone?C.muted:C.white}},m.name+(m.section?" - "+m.section:"")),
-            React.createElement("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:3}},m.date+(m.location?" - "+m.location:"")),
-            m.start_time&&React.createElement("div",{style:{fontSize:11,color:C.offWhite,fontFamily:"'Oswald',sans-serif",marginTop:2}},"Start: "+m.start_time),
-            m.bus_time&&React.createElement("div",{style:{fontSize:11,color:C.goldBright,fontFamily:"'Oswald',sans-serif",marginTop:2}},"Bus: "+m.bus_time)
+      var countdownStr=null;
+      if(!isDone&&daysUntil!==null){
+        if(daysUntil===0) countdownStr="TODAY";
+        else if(daysUntil===1) countdownStr="TOMORROW";
+        else if(daysUntil>0) countdownStr=daysUntil+" DAYS";
+        else countdownStr=null;
+      }
+      return R("div",{key:m.id,style:{background:isNext?"linear-gradient(135deg,#180E00,"+C.card+")":C.card,border:"1px solid "+(isNext?C.goldBright+"55":C.cardBorder),borderRadius:14,padding:16,marginBottom:12,opacity:isDone?0.7:1,position:"relative",overflow:"hidden"}},
+        isNext&&R("div",{style:{position:"absolute",left:0,top:0,bottom:0,width:3,background:C.goldBright}}),
+        isDone&&R("div",{style:{position:"absolute",left:0,top:0,bottom:0,width:3,background:C.muted}}),
+        R("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}},
+          R("div",null,
+            R("div",{style:{fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:isNext?C.goldBright:isDone?C.muted:C.white}},m.name+(m.section?" - "+m.section:"")),
+            R("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:3}},m.date+(m.location?" - "+m.location:"")),
+            m.start_time&&R("div",{style:{fontSize:11,color:C.offWhite,fontFamily:"'Oswald',sans-serif",marginTop:2}},"Start: "+m.start_time),
+            m.bus_time&&R("div",{style:{fontSize:11,color:C.goldBright,fontFamily:"'Oswald',sans-serif",marginTop:2}},"Bus: "+m.bus_time)
           ),
-          React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:6}},
-            isDone?React.createElement("div",{style:{width:28,height:28,borderRadius:"50%",background:C.muted+"33",border:"1px solid "+C.muted,display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement(Icon,{n:"chk",size:14,color:C.muted}))
-              :isNext?React.createElement("div",{style:{padding:"4px 10px",background:C.goldBright+"22",border:"1px solid "+C.goldBright+"55",borderRadius:6,fontSize:10,color:C.goldBright,fontFamily:"'Oswald',sans-serif"}},"NEXT")
-              :React.createElement("div",{style:{padding:"4px 10px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:6,fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"UPCOMING"),
-            (m.location||m.city)&&React.createElement("button",{onClick:function(){var q=encodeURIComponent((m.location||"")+((m.location&&m.city)?", ":"")+(m.city||""));window.open("https://maps.google.com/?q="+q,"_blank");},style:{display:"flex",alignItems:"center",gap:4,padding:"4px 10px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:6,color:C.goldBright,fontSize:10,fontFamily:"'Oswald',sans-serif",cursor:"pointer",fontWeight:700}},
-              React.createElement(Icon,{n:"pin",size:10,color:C.goldBright,sw:2}),
+          R("div",{style:{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:6}},
+            countdownStr&&R("div",{style:{padding:"4px 10px",background:daysUntil===0?C.goldBright:C.goldBright+"22",border:"1px solid "+C.goldBright+"55",borderRadius:6,fontSize:10,color:daysUntil===0?C.black:C.goldBright,fontFamily:"'Oswald',sans-serif",fontWeight:700}},countdownStr),
+            isDone&&R("div",{style:{width:28,height:28,borderRadius:"50%",background:C.muted+"33",border:"1px solid "+C.muted,display:"flex",alignItems:"center",justifyContent:"center"}},R(Icon,{n:"chk",size:14,color:C.muted})),
+            (m.location||m.city)&&R("button",{onClick:function(){var q=encodeURIComponent((m.location||"")+((m.location&&m.city)?", ":"")+(m.city||""));window.open("https://maps.google.com/?q="+q,"_blank");},style:{display:"flex",alignItems:"center",gap:4,padding:"4px 10px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:6,color:C.goldBright,fontSize:10,fontFamily:"'Oswald',sans-serif",cursor:"pointer",fontWeight:700}},
+              R("svg",{width:10,height:10,viewBox:"0 0 24 24",fill:"none",stroke:C.goldBright,strokeWidth:2,strokeLinecap:"round",strokeLinejoin:"round"},R("path",{d:"M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"}),R("circle",{cx:12,cy:10,r:3})),
               "DIRECTIONS"
             )
           )
         ),
-        m.course_note&&React.createElement("div",{style:{padding:"4px 10px",background:cc+"18",border:"1px solid "+cc+"33",borderRadius:6,fontSize:10,color:cc,fontFamily:"'Oswald',sans-serif",display:"inline-block",marginBottom:6}},m.course_note),
-        isDone&&(m.boys_place||m.girls_place)&&React.createElement("div",{style:{display:"flex",gap:10,marginTop:6}},
-          m.boys_place&&React.createElement("div",{style:{padding:"4px 12px",background:C.gold+"18",border:"1px solid "+C.gold+"33",borderRadius:6,fontSize:11,color:C.gold,fontFamily:"'Oswald',sans-serif"}},"Boys: "+m.boys_place+suffix(m.boys_place)+(m.boys_points?" ("+m.boys_points+" pts)":"")),
-          m.girls_place&&React.createElement("div",{style:{padding:"4px 12px",background:C.gold+"18",border:"1px solid "+C.gold+"33",borderRadius:6,fontSize:11,color:C.gold,fontFamily:"'Oswald',sans-serif"}},"Girls: "+m.girls_place+suffix(m.girls_place)+(m.girls_points?" ("+m.girls_points+" pts)":""))
+        m.course_note&&R("div",{style:{padding:"4px 10px",background:cc+"18",border:"1px solid "+cc+"33",borderRadius:6,fontSize:10,color:cc,fontFamily:"'Oswald',sans-serif",display:"inline-block",marginBottom:6}},m.course_note),
+        // Weather for upcoming meets with city
+        !isDone&&m.city&&R(MeetWeatherBadge,{city:m.city,date:m.date}),
+        isDone&&(m.boys_place||m.girls_place)&&R("div",{style:{display:"flex",gap:10,marginTop:6}},
+          m.boys_place&&R("div",{style:{padding:"4px 12px",background:C.gold+"18",border:"1px solid "+C.gold+"33",borderRadius:6,fontSize:11,color:C.gold,fontFamily:"'Oswald',sans-serif"}},"Boys: "+m.boys_place+suffix(m.boys_place)+(m.boys_points?" ("+m.boys_points+" pts)":"")),
+          m.girls_place&&R("div",{style:{padding:"4px 12px",background:C.gold+"18",border:"1px solid "+C.gold+"33",borderRadius:6,fontSize:11,color:C.gold,fontFamily:"'Oswald',sans-serif"}},"Girls: "+m.girls_place+suffix(m.girls_place)+(m.girls_points?" ("+m.girls_points+" pts)":""))
         )
       );
     })
@@ -1688,4 +1747,3 @@ ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(
 </script>
 </body>
 </html>
-
