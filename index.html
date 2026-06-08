@@ -1607,14 +1607,14 @@ function RosterManager(props){
         R("select",{value:form.grade||9,onChange:function(e){setForm(Object.assign({},form,{grade:e.target.value}));},style:inp()},[6,7,8,9,10,11,12].map(function(g){return R("option",{key:g,value:g},"Grade "+g);})),
         R("select",{value:form.gender||"boys",onChange:function(e){setForm(Object.assign({},form,{gender:e.target.value}));},style:inp()},R("option",{value:"boys"},"Boys"),R("option",{value:"girls"},"Girls"))
       ),
+      R("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:8}},"TRACK PRs"),
       R("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:6}},
-        R("input",{placeholder:"400m PR",value:form.pr_400||"",onChange:function(e){setForm(Object.assign({},form,{pr_400:e.target.value}));},style:inp()}),
-        R("input",{placeholder:"3K PR",value:form.pr_3k||"",onChange:function(e){setForm(Object.assign({},form,{pr_3k:e.target.value}));},style:inp()}),
-        R("input",{placeholder:"5K PR",value:form.pr_5k||"",onChange:function(e){setForm(Object.assign({},form,{pr_5k:e.target.value}));},style:inp()})
+        R("input",{placeholder:"400m (e.g. 1:02)",value:form.pr_400||"",onChange:function(e){setForm(Object.assign({},form,{pr_400:e.target.value}));},style:inp()}),
+        R("input",{placeholder:"800m (e.g. 2:18)",value:form.pr_800||"",onChange:function(e){setForm(Object.assign({},form,{pr_800:e.target.value}));},style:inp()})
       ),
-      R("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}},
-        R("input",{placeholder:"1600m",value:form.pr_1600||"",onChange:function(e){setForm(Object.assign({},form,{pr_1600:e.target.value}));},style:inp()}),
-        R("input",{placeholder:"800m",value:form.pr_800||"",onChange:function(e){setForm(Object.assign({},form,{pr_800:e.target.value}));},style:inp()})
+      R("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:6}},
+        R("input",{placeholder:"1600m (e.g. 5:12)",value:form.pr_1600||"",onChange:function(e){setForm(Object.assign({},form,{pr_1600:e.target.value}));},style:inp()}),
+        R("input",{placeholder:"3K XC (e.g. 11:34)",value:form.pr_3k||"",onChange:function(e){setForm(Object.assign({},form,{pr_3k:e.target.value}));},style:inp()})
       ),
       R("div",{style:{background:C.goldBright+"12",border:"1px solid "+C.goldBright+"22",borderRadius:8,padding:"10px 12px",marginBottom:14}},
         R("div",{style:{fontSize:9,color:C.goldBright,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginBottom:6}},"DANIELS BASELINE (VDOT)"),
