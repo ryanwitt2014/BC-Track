@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,7 +43,7 @@ const C = {
   alert:"#E8A020", red:"#E05A2B"
 };
 
-const SLOGANS = ["BUILT IN BENTON","PROTECT THE HERD","EVERY MILE BUILDS THE HERD","IT'S BETTER IN BENTON"];
+const SLOGANS = ["BUILT IN BENTON","PROTECT THE HERD","EVERY MILE BUILDS THE HERD","ITS BETTER IN BENTON"];
 const DAYS = ["MON","TUE","WED","THU","FRI","SAT","SUN"];
 const BADGES = ["","Emerging Leader","Quiet Leader","Team Connector","Accountability Leader","Most Encouraging","Future Captain","Positive Competitor"];
 const PACE_TYPES = [
@@ -1106,7 +1107,7 @@ function RosterManager({athletes,onBack,onRefresh,showMsg}){
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:6}}><input placeholder="1600m" value={form.pr_1600||""} onChange={e=>setForm({...form,pr_1600:e.target.value})} style={inp()}/><input placeholder="800m" value={form.pr_800||""} onChange={e=>setForm({...form,pr_800:e.target.value})} style={inp()}/></div>
     <div style={{background:C.goldBright+"12",border:"1px solid "+C.goldBright+"22",borderRadius:8,padding:"10px 12px",marginBottom:14}}>
       <div style={{fontSize:9,color:C.goldBright,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginBottom:6}}>DANIELS BASELINE (VDOT)</div>
-      <div style={{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:8,lineHeight:1.5}}>Enter this athlete's 1-mile time from the beginning-of-season time trial. Used to calculate Daniels VDOT training paces.</div>
+      <div style={{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:8,lineHeight:1.5}}>Enter the 1-mile baseline time from the beginning-of-season time trial. Used to calculate Daniels VDOT training paces.</div>
       <input placeholder="1-mile baseline (e.g. 6:34)" value={form.pr_baseline||""} onChange={e=>setForm({...form,pr_baseline:e.target.value})} style={inp({marginBottom:0})}/>
       {form.pr_baseline&&calcPaces(form.pr_baseline)&&<div style={{marginTop:8,display:"flex",gap:12,flexWrap:"wrap"}}>
         {[{l:"EASY",k:"easy"},{l:"THRESH",k:"threshold"},{l:"INTERVAL",k:"interval"},{l:"RACE",k:"race"}].map(p=>{const paces=calcPaces(form.pr_baseline);return <div key={p.k} style={{textAlign:"center"}}><div style={{fontSize:13,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright}}>{paces[p.k]}</div><div style={{fontSize:8,color:C.muted,fontFamily:"'Oswald',sans-serif"}}>{p.l}</div></div>;})}
