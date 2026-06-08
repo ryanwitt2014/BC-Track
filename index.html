@@ -1,21 +1,1691 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<title>Test</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<title>Benton Central Cross Country / Track and Field</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap" rel="stylesheet"/>
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v19.0&appId=844093358324586"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:#000;overflow:hidden;}
+::-webkit-scrollbar{display:none;}
+button,select,input,textarea{font-family:"Oswald",sans-serif;}
+select option{background:#111;color:#F4F4F0;}
+@keyframes pulse{0%,100%{opacity:0.3;transform:scale(0.8)}50%{opacity:1;transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+</style>
 </head>
 <body>
 <div id="root"></div>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone@7.23.10/babel.min.js"></script>
-<script type="text/babel">
-function App() {
-  return <div style={{color:"gold",fontSize:32,fontFamily:"sans-serif",padding:40}}>BC Track and XC is loading correctly!</div>;
+<script>
+var useState=React.useState;
+var useEffect=React.useEffect;
+var useRef=React.useRef;
+var useCallback=React.useCallback;
+var WINDMILL_URL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgdmlld0JveD0iMCAwIDY4MCAzMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgZmlsbD0iIzBBMEEwQSIgd2lkdGg9IjY4MCIgaGVpZ2h0PSIzMDAiLz48Y2lyY2xlIGZpbGw9IiNGMEI0MjkiIG9wYWNpdHk9IjAuNyIgY3g9IjQyIiBjeT0iMjIiIHI9IjEiLz48Y2lyY2xlIGZpbGw9IiNGMEI0MjkiIG9wYWNpdHk9IjAuNCIgY3g9Ijk4IiBjeT0iMTQiIHI9IjAuOCIvPjxjaXJjbGUgZmlsbD0iI0YwQjQyOSIgb3BhY2l0eT0iMC43IiBjeD0iMTU1IiBjeT0iMzAiIHI9IjAuOSIvPjxjaXJjbGUgZmlsbD0iI0YwQjQyOSIgb3BhY2l0eT0iMC40IiBjeD0iMjEwIiBjeT0iMTAiIHI9IjAuNyIvPjxjaXJjbGUgZmlsbD0iI0YwQjQyOSIgb3BhY2l0eT0iMC43IiBjeD0iMjcwIiBjeT0iMjAiIHI9IjEiLz48Y2lyY2xlIGZpbGw9IiNGMEI0MjkiIG9wYWNpdHk9IjAuNCIgY3g9IjMzMCIgY3k9IjgiIHI9IjAuOCIvPjxjaXJjbGUgZmlsbD0iI0YwQjQyOSIgb3BhY2l0eT0iMC43IiBjeD0iMzkwIiBjeT0iMjUiIHI9IjAuOSIvPjxjaXJjbGUgZmlsbD0iI0YwQjQyOSIgb3BhY2l0eT0iMC40IiBjeD0iNDQwIiBjeT0iMTIiIHI9IjAuNyIvPjxjaXJjbGUgZmlsbD0iI0YwQjQyOSIgb3BhY2l0eT0iMC43IiBjeD0iNTAwIiBjeT0iMTgiIHI9IjEiLz48Y2lyY2xlIGZpbGw9IiNGMEI0MjkiIG9wYWNpdHk9IjAuNCIgY3g9IjU2MCIgY3k9IjI4IiByPSIwLjgiLz48Y2lyY2xlIGZpbGw9IiNGMEI0MjkiIG9wYWNpdHk9IjAuNyIgY3g9IjYyMCIgY3k9IjE1IiByPSIwLjkiLz48Y2lyY2xlIGZpbGw9IiNGMEI0MjkiIG9wYWNpdHk9IjAuNCIgY3g9IjY0NSIgY3k9IjM1IiByPSIwLjciLz48Y2lyY2xlIGZpbGw9IiNGMEI0MjkiIG9wYWNpdHk9IjAuNCIgY3g9Ijc1IiBjeT0iNDUiIHI9IjAuNiIvPjxjaXJjbGUgZmlsbD0iI0YwQjQyOSIgb3BhY2l0eT0iMC43IiBjeD0iMTg1IiBjeT0iNTAiIHI9IjAuOCIvPjxjaXJjbGUgZmlsbD0iI0YwQjQyOSIgb3BhY2l0eT0iMC40IiBjeD0iMzU1IiBjeT0iNDIiIHI9IjAuNiIvPjxjaXJjbGUgZmlsbD0iI0YwQjQyOSIgb3BhY2l0eT0iMC43IiBjeD0iNDc1IiBjeT0iMzgiIHI9IjAuNyIvPjxjaXJjbGUgZmlsbD0iI0YwQjQyOSIgb3BhY2l0eT0iMC40IiBjeD0iNTk1IiBjeT0iNTIiIHI9IjAuNiIvPjxlbGxpcHNlIGZpbGw9IiNGMEI0MjkiIG9wYWNpdHk9IjAuMDUiIGN4PSIzNDAiIGN5PSIyMDAiIHJ4PSIzMjAiIHJ5PSI2MCIvPjxwYXRoIGZpbGw9IiMwRDBEMEQiIGQ9Ik0wIDIyMCBRODAgMTgwIDE2MCAxOTUgUTI0MCAyMTAgMzIwIDE4NSBRNDAwIDE2MCA0ODAgMTkwIFE1NjAgMjE1IDY0MCAxOTUgTDY4MCAyMDAgTDY4MCAzMDAgTDAgMzAwWiIvPjxwYXRoIGZpbGw9IiMxMTEiIGQ9Ik0wIDI0MCBRNjAgMjE1IDEzMCAyMjUgUTIwMCAyMzUgMjgwIDIxMCBRMzUwIDE5MCA0MjAgMjE1IFE0OTAgMjM1IDU2MCAyMjAgUTYyMCAyMTAgNjgwIDIyNSBMNjgwIDMwMCBMMCAzMDBaIi8+PHBhdGggZmlsbD0iIzBFMEUwRSIgZD0iTTAgMjY1IFExMDAgMjQ4IDIwMCAyNTggUTMwMCAyNjggNDAwIDI1MiBRNTAwIDIzOCA2MDAgMjU1IFE2NDAgMjYyIDY4MCAyNTggTDY4MCAzMDAgTDAgMzAwWiIvPjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzFFMUUxRSIgc3Ryb2tlLXdpZHRoPSIwLjgiIGQ9Ik0wIDI3NSBRMTcwIDI3MCAzNDAgMjc4IFE1MTAgMjg1IDY4MCAyNzQiLz48cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMxRTFFMUUiIHN0cm9rZS13aWR0aD0iMC42IiBkPSJNMCAyODUgUTE3MCAyODEgMzQwIDI4NyBRNTEwIDI5MyA2ODAgMjgzIi8+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoODAsMTkwKSI+PHBvbHlnb24gZmlsbD0iIzFBMUExQSIgc3Ryb2tlPSIjMkEyQTJBIiBzdHJva2Utd2lkdGg9IjAuNSIgcG9pbnRzPSItNCwwIDQsMCAyLDcwIC0yLDcwIi8+PGNpcmNsZSBmaWxsPSIjMjIyIiBjeD0iMCIgY3k9IjAiIHI9IjQiLz48cGF0aCBmaWxsPSIjMUMxQzFDIiBkPSJNMCwtNCBMLTMsLTMyIEwzLC0zMloiIHRyYW5zZm9ybT0icm90YXRlKDApIi8+PHBhdGggZmlsbD0iIzFDMUMxQyIgZD0iTTAsLTQgTC0zLC0zMiBMMywtMzJaIiB0cmFuc2Zvcm09InJvdGF0ZSgxMjApIi8+PHBhdGggZmlsbD0iIzFDMUMxQyIgZD0iTTAsLTQgTC0zLC0zMiBMMywtMzJaIiB0cmFuc2Zvcm09InJvdGF0ZSgyNDApIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4NSwxNjUpIj48cG9seWdvbiBmaWxsPSIjMUExQTFBIiBzdHJva2U9IiMyQTJBMkEiIHN0cm9rZS13aWR0aD0iMC41IiBwb2ludHM9Ii01LDAgNSwwIDMsOTUgLTMsOTUiLz48Y2lyY2xlIGZpbGw9IiMyMjIiIGN4PSIwIiBjeT0iMCIgcj0iNS41Ii8+PHBhdGggZmlsbD0iIzFDMUMxQyIgZD0iTTAsLTUgTC00LC00NiBMNCwtNDZaIiB0cmFuc2Zvcm09InJvdGF0ZSgzMCkiLz48cGF0aCBmaWxsPSIjMUMxQzFDIiBkPSJNMCwtNSBMLTQsLTQ2IEw0LC00NloiIHRyYW5zZm9ybT0icm90YXRlKDE1MCkiLz48cGF0aCBmaWxsPSIjMUMxQzFDIiBkPSJNMCwtNSBMLTQsLTQ2IEw0LC00NloiIHRyYW5zZm9ybT0icm90YXRlKDI3MCkiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzQwLDE0MCkiPjxwb2x5Z29uIGZpbGw9IiMxQTFBMUEiIHN0cm9rZT0iIzJBMkEyQSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHBvaW50cz0iLTcsMCA3LDAgNCwxMzAgLTQsMTMwIi8+PGNpcmNsZSBmaWxsPSIjMjIyIiBjeD0iMCIgY3k9IjAiIHI9IjgiLz48cGF0aCBmaWxsPSIjMUMxQzFDIiBkPSJNMCwtNyBMLTYsLTY4IEw2LC02OFoiIHRyYW5zZm9ybT0icm90YXRlKDE1KSIvPjxwYXRoIGZpbGw9IiMxQzFDMUMiIGQ9Ik0wLC03IEwtNiwtNjggTDYsLTY4WiIgdHJhbnNmb3JtPSJyb3RhdGUoMTM1KSIvPjxwYXRoIGZpbGw9IiMxQzFDMUMiIGQ9Ik0wLC03IEwtNiwtNjggTDYsLTY4WiIgdHJhbnNmb3JtPSJyb3RhdGUoMjU1KSIvPjxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIxMCIgZmlsbD0iI0YwQjQyOSIgb3BhY2l0eT0iMC4wOCIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1MDAsMTU4KSI+PHBvbHlnb24gZmlsbD0iIzFBMUExQSIgc3Ryb2tlPSIjMkEyQTJBIiBzdHJva2Utd2lkdGg9IjAuNSIgcG9pbnRzPSItNSwwIDUsMCAzLDEwMCAtMywxMDAiLz48Y2lyY2xlIGZpbGw9IiMyMjIiIGN4PSIwIiBjeT0iMCIgcj0iNS41Ii8+PHBhdGggZmlsbD0iIzFDMUMxQyIgZD0iTTAsLTUgTC00LC00OCBMNCwtNDhaIiB0cmFuc2Zvcm09InJvdGF0ZSg2MCkiLz48cGF0aCBmaWxsPSIjMUMxQzFDIiBkPSJNMCwtNSBMLTQsLTQ4IEw0LC00OFoiIHRyYW5zZm9ybT0icm90YXRlKDE4MCkiLz48cGF0aCBmaWxsPSIjMUMxQzFDIiBkPSJNMCwtNSBMLTQsLTQ4IEw0LC00OFoiIHRyYW5zZm9ybT0icm90YXRlKDMwMCkiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNjEwLDE4NSkiPjxwb2x5Z29uIGZpbGw9IiMxQTFBMUEiIHN0cm9rZT0iIzJBMkEyQSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHBvaW50cz0iLTMsMCAzLDAgMiw3MiAtMiw3MiIvPjxjaXJjbGUgZmlsbD0iIzIyMiIgY3g9IjAiIGN5PSIwIiByPSIzLjUiLz48cGF0aCBmaWxsPSIjMUMxQzFDIiBkPSJNMCwtMyBMLTIuNSwtMzAgTDIuNSwtMzBaIiB0cmFuc2Zvcm09InJvdGF0ZSg4MCkiLz48cGF0aCBmaWxsPSIjMUMxQzFDIiBkPSJNMCwtMyBMLTIuNSwtMzAgTDIuNSwtMzBaIiB0cmFuc2Zvcm09InJvdGF0ZSgyMDApIi8+PHBhdGggZmlsbD0iIzFDMUMxQyIgZD0iTTAsLTMgTC0yLjUsLTMwIEwyLjUsLTMwWiIgdHJhbnNmb3JtPSJyb3RhdGUoMzIwKSIvPjwvZz48L3N2Zz4=";
+
+const SUPA_URL="https://libtsqsppfwsvmphohin.supabase.co";
+const SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpYnRzcXNwcGZ3c3ZtcGhvaGluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MDAxMDIsImV4cCI6MjA5NTk3NjEwMn0.4pL3PZ-cxgC9Q3sJZzEsZz1UEV6Q6qENOGuFaP1bV6s";
+const PIN="1234";
+const FB_PAGE="https://www.facebook.com/profile.php?id=61590706914881";
+const WEATHER_KEY="2b2ce4de4544893f1a0791405eb2addb";
+const GROQ_KEY="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";
+const FB_APP_ID="844093358324586";
+
+const C={
+  black:"#080808",darkCard:"#0F0F0F",card:"#141414",cardBorder:"#2A2A2A",
+  gold:"#C9960C",goldBright:"#F0B429",goldDim:"#8A6408",
+  green:"#1E4620",greenLight:"#3A7D40",
+  white:"#F4F4F0",offWhite:"#C8C8C0",muted:"#6A6A6A",subtle:"#1A1A1A",
+  alert:"#E8A020",red:"#E05A2B"
+};
+
+const SLOGANS=["BUILT IN BENTON","PROTECT THE HERD","EVERY MILE BUILDS THE HERD","ITS BETTER IN BENTON"];
+const DAYS=["MON","TUE","WED","THU","FRI","SAT","SUN"];
+const BADGES=["","Emerging Leader","Quiet Leader","Team Connector","Accountability Leader","Most Encouraging","Future Captain","Positive Competitor"];
+const PACE_TYPES=[
+  {id:"easy",label:"Easy",color:"#3A7D40",desc:"Conversational, aerobic base"},
+  {id:"long",label:"Long Run",color:"#3A7D40",desc:"Aerobic endurance"},
+  {id:"threshold",label:"Threshold",color:"#F0B429",desc:"Comfortably hard 20min"},
+  {id:"interval",label:"Interval",color:"#E8A020",desc:"VO2 max 3-5min reps"},
+  {id:"rep",label:"Repetition",color:"#E05A2B",desc:"Speed and economy"},
+  {id:"race",label:"Race Pace",color:"#F4F4F0",desc:"Goal race pace"},
+  {id:"rest",label:"Rest",color:"#6A6A6A",desc:"Recovery day"},
+];
+const EVENTS={
+  "3K XC":{label:"3K Cross Country",short:"3K XC",prKey:"pr_3k",checkpoints:[{id:"1mile",label:"1 Mile Split",dist:1609,total:3000},{id:"finish",label:"Finish",dist:3000,total:3000}]},
+  "1600m":{label:"1600m Mile",short:"Mile",prKey:"pr_1600",checkpoints:[{id:"400",label:"400m Split",dist:400,total:1600},{id:"800",label:"800m Split",dist:800,total:1600},{id:"finish",label:"Finish",dist:1600,total:1600}]},
+  "800m":{label:"800m",short:"800m",prKey:"pr_800",checkpoints:[{id:"400",label:"400m Split",dist:400,total:800},{id:"finish",label:"Finish",dist:800,total:800}]},
+  "400m":{label:"400m",short:"400m",prKey:"pr_400",checkpoints:[{id:"finish",label:"Finish",dist:400,total:400}]},
+};
+const RECORD_EVENTS=[
+  {id:"boys_110h",label:"110m Hurdles",gender:"boys",type:"time"},
+  {id:"girls_100h",label:"100m Hurdles",gender:"girls",type:"time"},
+  {id:"100m_boys",label:"100m Dash",gender:"boys",type:"time"},
+  {id:"100m_girls",label:"100m Dash",gender:"girls",type:"time"},
+  {id:"200m_boys",label:"200m Dash",gender:"boys",type:"time"},
+  {id:"200m_girls",label:"200m Dash",gender:"girls",type:"time"},
+  {id:"400m_boys",label:"400m Run",gender:"boys",type:"time"},
+  {id:"400m_girls",label:"400m Run",gender:"girls",type:"time"},
+  {id:"800m_boys",label:"800m Run",gender:"boys",type:"time"},
+  {id:"800m_girls",label:"800m Run",gender:"girls",type:"time"},
+  {id:"1600m_boys",label:"1600m Run",gender:"boys",type:"time"},
+  {id:"1600m_girls",label:"1600m Run",gender:"girls",type:"time"},
+  {id:"4x100_boys",label:"4x100m Relay",gender:"boys",type:"time",relay:true},
+  {id:"4x100_girls",label:"4x100m Relay",gender:"girls",type:"time",relay:true},
+  {id:"4x400_boys",label:"4x400m Relay",gender:"boys",type:"time",relay:true},
+  {id:"4x400_girls",label:"4x400m Relay",gender:"girls",type:"time",relay:true},
+  {id:"lj_boys",label:"Long Jump",gender:"boys",type:"field"},
+  {id:"lj_girls",label:"Long Jump",gender:"girls",type:"field"},
+  {id:"hj_boys",label:"High Jump",gender:"boys",type:"field"},
+  {id:"hj_girls",label:"High Jump",gender:"girls",type:"field"},
+  {id:"sp_boys",label:"Shot Put",gender:"boys",type:"field"},
+  {id:"sp_girls",label:"Shot Put",gender:"girls",type:"field"},
+  {id:"disc_boys",label:"Discus",gender:"boys",type:"field"},
+  {id:"disc_girls",label:"Discus",gender:"girls",type:"field"},
+  {id:"xc_3k_6b",label:"3K XC - 6th Grade",gender:"boys",type:"time"},
+  {id:"xc_3k_6g",label:"3K XC - 6th Grade",gender:"girls",type:"time"},
+  {id:"xc_3k_7b",label:"3K XC - 7th Grade",gender:"boys",type:"time"},
+  {id:"xc_3k_7g",label:"3K XC - 7th Grade",gender:"girls",type:"time"},
+  {id:"xc_3k_8b",label:"3K XC - 8th Grade",gender:"boys",type:"time"},
+  {id:"xc_3k_8g",label:"3K XC - 8th Grade",gender:"girls",type:"time"},
+];
+
+function t2s(t){if(!t)return 9999;var p=t.split(":");return parseInt(p[0])*60+parseFloat(p[1]);}
+function s2t(s){if(!s&&s!==0)return "--";var m=Math.floor(s/60);var sc=Math.round(s%60).toString().padStart(2,"0");return m+":"+sc;}
+function ms2t(ms){var s=Math.floor(ms/1000);var m=Math.floor(s/60);var sc=(s%60).toString().padStart(2,"0");var cs=Math.floor((ms%1000)/10).toString().padStart(2,"0");return m+":"+sc+"."+cs;}
+function projFinish(ms,dd,tot){return (ms/dd)*tot;}
+function initials(n){return n?n.split(" ").map(function(x){return x[0];}).join(""):"?";}
+function safeGet(obj,key){return obj?obj[key]:null;}
+
+function calcPaces(pr){
+  if(!pr)return null;
+  var sec=t2s(pr);var mi=sec/1.864;
+  return {easy:s2t(mi*1.38),long:s2t(mi*1.43),threshold:s2t(mi*1.12),interval:s2t(mi*1.02),rep:s2t(mi*0.94),race:s2t(mi)};
 }
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+function calcGoal(a,evKey){
+  var ev=EVENTS[evKey];if(!ev)return null;
+  var pr=a[ev.prKey];
+  var sm=a.primary_sport==="distance"?0.97:a.primary_sport==="sprinting"?1.02:a.primary_sport==="strength"?1.04:0.99;
+  if(pr)return t2s(pr)*sm;
+  if(a.pr_3k){var pm=t2s(a.pr_3k)/3000;if(evKey==="1600m")return pm*1600*0.94*sm;if(evKey==="800m")return pm*800*0.90*sm;if(evKey==="400m")return pm*400*0.86*sm;}
+  return null;
+}
+function calcProjections(athlete,results,meets){
+  var mr=results.filter(function(r){return r.athlete_id===athlete.id&&r.time&&r.time.indexOf("_split")===-1;}).map(function(r){var mt=meets.find(function(m){return m.id===r.meet_id;});return Object.assign({},r,{meet:mt});}).sort(function(a,b){return new Date(safeGet(a.meet,"date")||0)-new Date(safeGet(b.meet,"date")||0);});
+  if(mr.length<3)return null;
+  var allTimes=mr.map(function(r){return t2s(r.time);}).filter(function(t){return t<9999;});
+  if(allTimes.length<3)return null;
+  var best=Math.min.apply(null,allTimes);
+  var sorted=allTimes.slice().sort(function(a,b){return a-b;});
+  var second=sorted[1]||sorted[0];
+  var bestImprovement=Math.max(second-best,0);
+  var perMeet=Math.min(bestImprovement/2,8);
+  var pr=best;
+  var rem=Math.max(meets.filter(function(m){return m.status==="upcoming"||m.status==="next";}).length,1);
+  var nextMeet=s2t(Math.max(pr-perMeet,pr*0.97));
+  var eos=s2t(Math.max(pr-(perMeet*rem),pr*0.93));
+  var nextYear=athlete.grade<=8?s2t(Math.max(pr-(perMeet*8),pr*0.87)):null;
+  return {avg:perMeet.toFixed(1),nextMeet:nextMeet,eos:eos,nextYear:nextYear,count:mr.length,trending:bestImprovement>2};
+}
+
+var db={
+  get:function(t,q){return fetch(SUPA_URL+"/rest/v1/"+t+(q||""),{headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY,"Content-Type":"application/json"}}).then(function(r){return r.json();});},
+  post:function(t,b){return fetch(SUPA_URL+"/rest/v1/"+t,{method:"POST",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify(b)}).then(function(r){return r.json();});},
+  patch:function(t,id,b){return fetch(SUPA_URL+"/rest/v1/"+t+"?id=eq."+id,{method:"PATCH",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY,"Content-Type":"application/json",Prefer:"return=representation"},body:JSON.stringify(b)}).then(function(r){return r.json();});},
+  del:function(t,id){return fetch(SUPA_URL+"/rest/v1/"+t+"?id=eq."+id,{method:"DELETE",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});},
+  uploadFile:function(bucket,path,f){return fetch(SUPA_URL+"/storage/v1/object/"+bucket+"/"+path,{method:"POST",headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY,"Content-Type":f.type,"x-upsert":"true"},body:f}).then(function(r){return r.ok?SUPA_URL+"/storage/v1/object/public/"+bucket+"/"+path:null;});}
+};
+
+
+function Avatar(props){
+  var athlete=props.athlete;var size=props.size||40;var border=props.border||false;
+  var r=size>50?14:10;var url=athlete&&athlete.photo_url;
+  var borderStyle=border?"2px solid "+C.goldBright+"55":"1px solid "+C.cardBorder;
+  if(url)return React.createElement("div",{style:{width:size,height:size,borderRadius:r,overflow:"hidden",flexShrink:0,border:borderStyle}},React.createElement("img",{src:url,alt:"",style:{width:"100%",height:"100%",objectFit:"cover",objectPosition:"top center"}}));
+  return React.createElement("div",{style:{width:size,height:size,borderRadius:r,background:"linear-gradient(135deg,#1A1A1A,#2A2A2A)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:Math.floor(size*0.32),fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright,flexShrink:0,border:borderStyle}},initials(athlete?athlete.name:""));
+}
+
+var IP={
+  home:"M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2zM9 22V12h6v10",
+  team:"M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M12 7a4 4 0 100-8 4 4 0 000 8M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75",
+  cal:"M3 4h18v18H3zM16 2v4M8 2v4M3 10h18",
+  bolt:"M13 2L3 14h9l-1 8 10-12h-9z",
+  trophy:"M6 9H4.5a2.5 2.5 0 010-5H6M18 9h1.5a2.5 2.5 0 000-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0012 0V2z",
+  flag:"M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7",
+  lock:"M3 11h18v11H3zM7 11V7a5 5 0 0110 0v4",
+  back:"M19 12H5M12 19l-7-7 7-7",
+  x:"M18 6L6 18M6 6l12 12",
+  plus:"M12 5v14M5 12h14",
+  edit:"M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z",
+  chk:"M20 6L9 17l-5-5",
+  timer:"M12 2a10 10 0 100 20 10 10 0 000-20zM12 6v6l4 2",
+  chart:"M18 20V10M12 20V4M6 20v-6",
+  shirt:"M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z",
+  fb:"M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z",
+  gear:"M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z",
+  pin:"M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0zM12 10m-3 0a3 3 0 106 0 3 3 0 00-6 0",
+};
+function Icon(props){
+  var n=props.n;var size=props.size||22;var color=props.color||C.white;var sw=props.sw||2;
+  var d=IP[n]||"";
+  return React.createElement("svg",{width:size,height:size,viewBox:"0 0 24 24",fill:"none",stroke:color,strokeWidth:sw,strokeLinecap:"round",strokeLinejoin:"round"},
+    d.split("M").filter(Boolean).map(function(seg,i){return React.createElement("path",{key:i,d:"M"+seg});})
+  );
+}
+
+function Logo(props){
+  var size=props.size||48;var logoUrl=props.logoUrl;
+  if(logoUrl)return React.createElement("img",{src:logoUrl,alt:"BC",style:{width:size,height:size,objectFit:"contain"}});
+  return React.createElement("svg",{width:size,height:size,viewBox:"0 0 300 290",fill:"none"},
+    React.createElement("path",{d:"M148 10 C90 10 40 42 24 85 C10 118 14 148 8 168 C2 188 12 215 30 232 C52 252 82 262 118 268 C145 272 165 268 182 258 C200 248 218 235 228 218 C244 196 252 172 248 148 C244 128 238 115 242 98 C246 82 258 72 256 58 C254 44 238 32 220 22 C202 12 176 10 148 10Z",fill:C.green}),
+    React.createElement("path",{d:"M210 22 C222 14 240 10 254 18 C268 26 272 42 264 54 C258 64 246 68 240 62 C250 50 248 36 238 30 C228 24 216 26 210 22Z",fill:C.goldBright}),
+    React.createElement("ellipse",{cx:"218",cy:"108",rx:"18",ry:"14",fill:C.white}),
+    React.createElement("ellipse",{cx:"214",cy:"108",rx:"10",ry:"10",fill:"#0A1A0A"}),
+    React.createElement("ellipse",{cx:"211",cy:"105",rx:"4",ry:"4",fill:C.black}),
+    React.createElement("text",{x:"66",y:"172",fontFamily:"Georgia,serif",fontWeight:"900",fontSize:"112",fill:C.goldBright},"B"),
+    React.createElement("text",{x:"118",y:"248",fontFamily:"Georgia,serif",fontWeight:"900",fontSize:"96",fill:C.goldBright},"C")
+  );
+}
+
+function Splash(props){
+  var onDone=props.onDone;var logoUrl=props.logoUrl;
+  var _s=useState(0);var ph=_s[0];var setPh=_s[1];
+  useEffect(function(){
+    var ts=[setTimeout(function(){setPh(1);},400),setTimeout(function(){setPh(2);},1000),setTimeout(function(){setPh(3);},1700),setTimeout(function(){setPh(4);},2500),setTimeout(function(){onDone();},3800)];
+    return function(){ts.forEach(function(t){clearTimeout(t);});};
+  },[]);
+  return React.createElement("div",{style:{position:"absolute",inset:0,zIndex:200,overflow:"hidden",opacity:ph>=4?0:1,transition:"opacity 0.8s"}},
+    React.createElement("div",{style:{position:"absolute",inset:0,background:"linear-gradient(180deg,#050505,#0A0800)"}}),
+    ph>=2&&React.createElement("div",{style:{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(to right,transparent,"+C.goldBright+",transparent)"}}),
+    ph>=2&&React.createElement("div",{style:{position:"absolute",bottom:0,left:0,right:0,height:2,background:"linear-gradient(to right,transparent,"+C.goldBright+",transparent)"}}),
+    React.createElement("div",{style:{position:"relative",zIndex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"100%"}},
+      React.createElement("div",{style:{opacity:ph>=1?1:0,transform:ph>=1?"scale(1)":"scale(0.3)",transition:"all 0.7s cubic-bezier(0.34,1.4,0.64,1)",marginBottom:28,filter:ph>=2?"drop-shadow(0 0 30px "+C.goldBright+"88)":"none"}},React.createElement(Logo,{size:130,logoUrl:logoUrl})),
+      React.createElement("div",{style:{opacity:ph>=2?1:0,transform:ph>=2?"translateY(0)":"translateY(20px)",transition:"all 0.5s ease",textAlign:"center"}},
+        React.createElement("div",{style:{fontSize:9,letterSpacing:"0.45em",color:C.gold,fontFamily:"'Oswald',sans-serif",fontWeight:600,marginBottom:8}},"BENTON CENTRAL"),
+        React.createElement("div",{style:{fontSize:30,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,letterSpacing:"0.06em",lineHeight:1.15}},"CROSS COUNTRY"),
+        React.createElement("div",{style:{fontSize:18,fontFamily:"'Oswald',sans-serif",fontWeight:400,color:C.offWhite,letterSpacing:"0.2em"}},"TRACK and FIELD")
+      ),
+      React.createElement("div",{style:{marginTop:10,opacity:ph>=3?1:0,fontSize:14,letterSpacing:"0.35em",color:C.goldBright,fontFamily:"'Oswald',sans-serif",fontWeight:700}},"THE HERD"),
+      React.createElement("div",{style:{width:ph>=3?180:0,height:1,background:"linear-gradient(to right,transparent,"+C.gold+",transparent)",marginTop:14,marginBottom:14,transition:"width 0.6s ease"}}),
+      React.createElement("div",{style:{opacity:ph>=3?1:0,transition:"opacity 0.6s ease",fontSize:12,color:C.offWhite,fontFamily:"'Oswald',sans-serif",fontStyle:"italic",letterSpacing:"0.15em"}},"BUILT IN BENTON"),
+      ph>=3&&React.createElement("div",{style:{position:"absolute",bottom:60,display:"flex",gap:8}},
+        [0,1,2].map(function(i){return React.createElement("div",{key:i,style:{width:6,height:6,borderRadius:"50%",background:C.goldBright,animation:"pulse 1.2s ease "+i*0.2+"s infinite"}});})
+      )
+    )
+  );
+}
+
+function Header(props){
+  var slogan=props.slogan;var onLogoPress=props.onLogoPress;var logoUrl=props.logoUrl;
+  return React.createElement("div",{style:{background:"#000",paddingTop:52,paddingBottom:14,paddingLeft:18,paddingRight:18,borderBottom:"1px solid "+C.cardBorder,position:"relative"}},
+    React.createElement("div",{style:{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(to right,"+C.goldDim+","+C.goldBright+","+C.goldDim+")"}}),
+    React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between"}},
+      React.createElement("div",null,
+        React.createElement("div",{style:{fontSize:8,letterSpacing:"0.5em",color:C.goldDim,fontFamily:"'Oswald',sans-serif",fontWeight:600}},"BENTON CENTRAL"),
+        React.createElement("div",{style:{fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,letterSpacing:"0.03em",lineHeight:1.15}},"CROSS COUNTRY / TRACK and FIELD"),
+        React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginTop:2}},"THE HERD - FALL 2026")
+      ),
+      React.createElement("button",{onClick:onLogoPress,style:{background:"none",border:"none",cursor:"pointer",filter:"drop-shadow(0 0 8px "+C.goldBright+"44)",marginLeft:10}},React.createElement(Logo,{size:46,logoUrl:logoUrl}))
+    ),
+    React.createElement("div",{style:{marginTop:8,fontSize:10,color:C.gold,fontFamily:"'Oswald',sans-serif",fontStyle:"italic",letterSpacing:"0.15em",opacity:0.9}},slogan)
+  );
+}
+
+function PinGate(props){
+  var onSuccess=props.onSuccess;
+  var _p=useState("");var pin=_p[0];var setPin=_p[1];
+  var _s=useState(false);var shake=_s[0];var setShake=_s[1];
+  function tap(k){
+    if(k==="X"){setPin(function(p){return p.slice(0,-1);});return;}
+    if(pin.length>=4)return;
+    var np=pin+k;setPin(np);
+    if(np.length===4){setTimeout(function(){if(np===PIN){onSuccess();setPin("");}else{setShake(true);setPin("");setTimeout(function(){setShake(false);},500);}},200);}
+  }
+  var keys=[1,2,3,4,5,6,7,8,9,"",0,"X"];
+  return React.createElement("div",{style:{padding:"40px 24px",display:"flex",flexDirection:"column",alignItems:"center"}},
+    React.createElement("div",{style:{width:72,height:72,borderRadius:20,background:"linear-gradient(135deg,#1A1A1A,#2A2A2A)",border:"1px solid "+C.cardBorder,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:24}},React.createElement(Icon,{n:"lock",size:32,color:C.goldBright})),
+    React.createElement("div",{style:{fontSize:22,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,marginBottom:6}},"COACH PORTAL"),
+    React.createElement("div",{style:{fontSize:12,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:36}},"Enter your PIN"),
+    React.createElement("div",{style:{display:"flex",gap:12,marginBottom:32,animation:shake?"shake 0.4s ease":"none"}},
+      [0,1,2,3].map(function(i){return React.createElement("div",{key:i,style:{width:14,height:14,borderRadius:"50%",background:i<pin.length?C.goldBright:C.subtle,border:"1px solid "+(i<pin.length?C.goldBright:C.cardBorder),transition:"all 0.2s"}});})
+    ),
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,width:"100%",maxWidth:280}},
+      keys.map(function(k,i){
+        return React.createElement("button",{key:i,onClick:function(){if(k!=="")tap(String(k));},style:{padding:"17px 0",background:k===""?"transparent":C.card,border:k===""?"none":"1px solid "+C.cardBorder,borderRadius:12,color:C.white,fontSize:20,cursor:k===""?"default":"pointer",fontFamily:"'Oswald',sans-serif"}},k==="X"?"del":k);
+      })
+    )
+  );
+}
+
+var _addNotif=null;
+function useNotifs(){
+  var _n=useState([]);var notifs=_n[0];var setNotifs=_n[1];
+  _addNotif=function(msg,type){var id=Date.now();setNotifs(function(p){return p.concat([{id:id,msg:msg,type:type||"info"}]);});setTimeout(function(){setNotifs(function(p){return p.filter(function(n){return n.id!==id;});});},4500);};
+  return notifs;
+}
+function notify(msg,type){if(_addNotif)_addNotif(msg,type);}
+function ToastLayer(props){
+  var notifs=props.notifs;
+  return React.createElement("div",{style:{position:"fixed",top:14,left:"50%",transform:"translateX(-50%)",zIndex:999,width:"92%",maxWidth:380,pointerEvents:"none"}},
+    notifs.map(function(n){
+      return React.createElement("div",{key:n.id,style:{background:n.type==="success"?"linear-gradient(135deg,#1A1200,#0A0A0A)":"linear-gradient(135deg,#1A0800,#0A0A0A)",border:"1px solid "+(n.type==="success"?C.goldBright:n.type==="alert"?C.alert:C.cardBorder),borderRadius:12,padding:"12px 16px",marginBottom:8}},
+        React.createElement("div",{style:{fontSize:9,color:n.type==="success"?C.goldBright:n.type==="alert"?C.alert:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginBottom:4}},n.type==="success"?"RECORDED":n.type==="alert"?"ALERT":"INFO"),
+        React.createElement("div",{style:{fontSize:13,color:C.white,fontFamily:"'Oswald',sans-serif",lineHeight:1.5}},n.msg)
+      );
+    })
+  );
+}
+
+
+function useWeather(city,date){
+  var _w=useState(null);var weather=_w[0];var setWeather=_w[1];
+  useEffect(function(){
+    if(!city)return;
+    fetch("https://api.openweathermap.org/geo/1.0/direct?q="+encodeURIComponent(city)+",US&limit=1&appid="+WEATHER_KEY)
+      .then(function(r){return r.json();})
+      .then(function(gd){
+        if(!gd||!gd[0])return;
+        var lat=gd[0].lat;var lon=gd[0].lon;
+        return fetch("https://api.openweathermap.org/data/2.5/forecast?lat="+lat+"&lon="+lon+"&appid="+WEATHER_KEY+"&units=imperial");
+      })
+      .then(function(r){return r&&r.json();})
+      .then(function(fd){
+        if(!fd||!fd.list)return;
+        var target=date?new Date(date).toDateString():new Date().toDateString();
+        var entry=fd.list.filter(function(e){return new Date(e.dt*1000).toDateString()===target;})[0]||fd.list[0];
+        setWeather({high:Math.round(entry.main.temp_max),low:Math.round(entry.main.temp_min),desc:entry.weather[0].description,icon:entry.weather[0].main});
+      })
+      .catch(function(){});
+  },[city,date]);
+  return weather;
+}
+
+function WeatherIcon(props){
+  var icon=props.icon;var size=props.size||28;
+  var col=icon==="Clear"?C.goldBright:icon==="Rain"||icon==="Drizzle"?"#6BA3FF":icon==="Thunderstorm"?"#C77DFF":C.offWhite;
+  var paths={
+    Clear:"M12 3v1M21 12h-1M18.36 5.64l-.7.7M5.64 5.64l.7.7M3 12H4M12 21v-1M18.36 18.36l-.7-.7M5.64 18.36l.7-.7M12 7a5 5 0 100 10 5 5 0 000-10z",
+    Clouds:"M17 8h1a4 4 0 010 8h-1M3 12a4 4 0 014-4h.5a5.5 5.5 0 0110.45 2.5A3.5 3.5 0 0117 20H7a5 5 0 01-4-8z",
+    Rain:"M20 16.2A4.5 4.5 0 0017.5 8h-1.8A7 7 0 104 14.9M8 19v2M12 17v4M16 19v2",
+    Thunderstorm:"M19 16.9A5 5 0 0014 8h-1.26A8 8 0 102 18.29M13 12l-4 6h6l-4 6",
+    Snow:"M20 16.2A4.5 4.5 0 0017.5 8h-1.8A7 7 0 104 14.9M8 15h.01M8 19h.01M12 17h.01M12 13h.01",
+    Drizzle:"M20 16.2A4.5 4.5 0 0017.5 8h-1.8A7 7 0 104 14.9M8 19v2M12 17v2M16 19v2",
+  };
+  var d=paths[icon]||paths["Clouds"];
+  return React.createElement("svg",{width:size,height:size,viewBox:"0 0 24 24",fill:"none",stroke:col,strokeWidth:"1.5",strokeLinecap:"round",strokeLinejoin:"round"},
+    d.split("M").filter(Boolean).map(function(seg,i){return React.createElement("path",{key:i,d:"M"+seg});})
+  );
+}
+
+function LiveTiming(props){
+  var athletes=props.athletes;var meets=props.meets;var onClose=props.onClose;
+  var _ph=useState("setup");var phase=_ph[0];var setPhase=_ph[1];
+  var _ev=useState("3K XC");var evKey=_ev[0];var setEvKey=_ev[1];
+  var _g=useState("boys");var gender=_g[0];var setGender=_g[1];
+  var _mi=useState("");var meetId=_mi[0];var setMeetId=_mi[1];
+  var _ru=useState(false);var running=_ru[0];var setRunning=_ru[1];
+  var _el=useState(0);var elapsed=_el[0];var setElapsed=_el[1];
+  var _am=useState({});var adMap=_am[0];var setAdMap=_am[1];
+  var _fc=useState(0);var finCount=_fc[0];var setFinCount=_fc[1];
+  var _sv=useState(false);var saving=_sv[0];var setSaving=_sv[1];
+  var _sd=useState(false);var saved=_sd[0];var setSaved=_sd[1];
+  var notifs=useNotifs();
+  var t0=useRef(null);var tmr=useRef(null);
+  var ev=EVENTS[evKey];
+  var roster=athletes.filter(function(a){return a.gender===gender;}).sort(function(a,b){return t2s(a.pr_3k||"99:99")-t2s(b.pr_3k||"99:99");});
+
+  function Stars(sp){
+    var a=sp.a;
+    if(!a.parent_phone)return null;
+    var count=a.parent_phone.split(",").filter(Boolean).length;
+    return React.createElement("span",null,
+      Array.from({length:count}).map(function(_,i){
+        return React.createElement("svg",{key:i,width:10,height:10,viewBox:"0 0 24 24",fill:C.goldBright,stroke:C.goldBright,strokeWidth:"1",style:{marginLeft:3}},
+          React.createElement("polygon",{points:"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"})
+        );
+      })
+    );
+  }
+
+  useEffect(function(){
+    if(running){t0.current=Date.now()-elapsed;tmr.current=setInterval(function(){setElapsed(Date.now()-t0.current);},50);}
+    else clearInterval(tmr.current);
+    return function(){clearInterval(tmr.current);};
+  },[running]);
+
+  useEffect(function(){
+    var d={};roster.forEach(function(a){d[a.id]={goalSec:calcGoal(a,evKey),splits:[],done:false,place:null};});
+    setAdMap(d);setFinCount(0);
+  },[evKey,gender]);
+
+  function nextCp(id){
+    var ad=adMap[id];if(!ad||ad.done)return null;
+    var done=ad.splits.map(function(s){return s.cpId;});
+    return ev.checkpoints.filter(function(c){return done.indexOf(c.id)===-1;})[0]||null;
+  }
+
+  function tapAthlete(a){
+    if(!running)return;var cp=nextCp(a.id);if(!cp)return;
+    var ms=elapsed;var ad=adMap[a.id];var gs=ad.goalSec;
+    var projMs=cp.id!=="finish"?projFinish(ms,cp.dist,cp.total):ms;
+    var atGoal=gs?gs*(cp.dist/cp.total)*1000:null;
+    var status=!atGoal?"on":ms-atGoal<-1500?"ahead":"on";
+    var isF=cp.id==="finish";var place=null;
+    if(isF){place=finCount+1;setFinCount(function(c){return c+1;});}
+    setAdMap(function(prev){
+      var newMap=Object.assign({},prev);
+      var newSplits=prev[a.id].splits.concat([{cpId:cp.id,label:cp.label,ms:ms,timeStr:ms2t(ms),projMs:projMs,status:status}]);
+      newMap[a.id]=Object.assign({},prev[a.id],{splits:newSplits,done:isF,place:place});
+      return newMap;
+    });
+    var name=a.short_name||a.name;
+    var mn=meets.filter(function(m){return m.id===meetId;})[0];
+    var meetName=mn?mn.name:"Today";
+    var gs2=gs?s2t(gs):"--";
+    if(isF){var met=gs&&(ms/1000)<=gs*1.01;notify(name+" finished "+ev.short+" in "+ms2t(ms)+" at "+meetName+". Goal: "+gs2+(met?". GOAL MET!":"."),met?"success":"alert");}
+    else notify(name+" - "+cp.label+": "+ms2t(ms)+" | Proj: "+s2t(projMs/1000)+(status==="ahead"?" | AHEAD":""),status==="ahead"?"success":"info");
+  }
+
+  function saveAll(){
+    if(!meetId)return;setSaving(true);
+    var promises=roster.map(function(a){
+      var ad=adMap[a.id];if(!ad||!ad.done)return Promise.resolve();
+      var fin=ad.splits.filter(function(s){return s.cpId==="finish";})[0];if(!fin)return Promise.resolve();
+      var sec=fin.ms/1000;var timeStr=s2t(sec);var goalTime=ad.goalSec?s2t(ad.goalSec):null;
+      return db.post("results",{athlete_id:a.id,meet_id:meetId,time:timeStr,place:ad.place,goal_time:goalTime}).then(function(){
+        var spl=ad.splits.filter(function(s){return s.cpId!=="finish";}).map(function(s){return s.label+": "+s.timeStr;}).join(" | ");
+        if(spl)return db.post("results",{athlete_id:a.id,meet_id:meetId,time:timeStr+"_split",notes:spl});
+      }).then(function(){
+        var pk=ev.prKey;if(!a[pk]||t2s(timeStr)<t2s(a[pk]))return db.patch("athletes",a.id,{[pk]:timeStr});
+      });
+    });
+    Promise.all(promises).then(function(){setSaving(false);setSaved(true);notify("Results saved","success");});
+  }
+
+  var inp=function(ex){return Object.assign({width:"100%",padding:"10px 12px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.white,fontFamily:"'Oswald',sans-serif",fontSize:13},ex||{});};
+
+  if(phase==="setup")return React.createElement("div",{style:{position:"absolute",inset:0,background:C.black,zIndex:40,display:"flex",flexDirection:"column"}},
+    React.createElement(ToastLayer,{notifs:notifs}),
+    React.createElement("div",{style:{background:C.black,paddingTop:54,paddingBottom:16,paddingLeft:18,paddingRight:18,borderBottom:"1px solid "+C.cardBorder,position:"relative"}},
+      React.createElement("div",{style:{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(to right,"+C.goldDim+","+C.goldBright+","+C.goldDim+")"}}),
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:14}},
+        React.createElement("button",{onClick:onClose,style:{background:"none",border:"none",cursor:"pointer"}},React.createElement(Icon,{n:"back",size:22,color:C.muted})),
+        React.createElement("div",{style:{fontSize:18,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"LIVE TIMING")
+      ),
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:12}},
+        Object.entries(EVENTS).map(function(entry){
+          var key=entry[0];var e=entry[1];
+          return React.createElement("button",{key:key,onClick:function(){setEvKey(key);},style:{padding:"12px 8px",background:evKey===key?"linear-gradient(135deg,#1A1000,#2A1800)":C.card,border:"1px solid "+(evKey===key?C.goldBright:C.cardBorder),borderRadius:10,cursor:"pointer",textAlign:"center"}},
+            React.createElement("div",{style:{fontSize:15,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:evKey===key?C.goldBright:C.muted}},e.short),
+            React.createElement("div",{style:{fontSize:9,color:evKey===key?C.gold:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:3}},e.checkpoints.map(function(c){return c.label;}).join(" > "))
+          );
+        })
+      ),
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}},
+        React.createElement("select",{value:meetId,onChange:function(e){setMeetId(e.target.value);},style:inp()},
+          React.createElement("option",{value:""},"Select meet..."),
+          meets.map(function(m){return React.createElement("option",{key:m.id,value:m.id},m.name);})
+        ),
+        React.createElement("div",{style:{display:"flex",background:C.card,borderRadius:8,padding:3,border:"1px solid "+C.cardBorder}},
+          ["boys","girls"].map(function(g){return React.createElement("button",{key:g,onClick:function(){setGender(g);},style:{flex:1,padding:"8px 0",background:gender===g?"linear-gradient(135deg,#1A1000,#2A1800)":"transparent",border:"none",borderRadius:6,color:gender===g?C.goldBright:C.muted,fontSize:11,cursor:"pointer",fontWeight:gender===g?700:400}},g.toUpperCase());})
+        )
+      )
+    ),
+    React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"14px 16px"}},
+      React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:10}},"GOAL TIMES - "+ev.short),
+      roster.map(function(a){
+        var goal=calcGoal(a,evKey);
+        return React.createElement("div",{key:a.id,style:{display:"flex",alignItems:"center",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:11,padding:"11px 14px",marginBottom:8}},
+          React.createElement(Avatar,{athlete:a,size:36}),
+          React.createElement("div",{style:{flex:1,marginLeft:12}},
+            React.createElement("div",{style:{display:"flex",alignItems:"center",gap:4}},
+              React.createElement("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}},a.short_name||a.name),
+              React.createElement(Stars,{a:a})
+            ),
+            React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:2}},"GR "+a.grade+" - PR "+(a[ev.prKey]||"none"))
+          ),
+          React.createElement("div",{style:{textAlign:"right"}},
+            React.createElement("div",{style:{fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright}},goal?s2t(goal):"--"),
+            React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.1em"}},"GOAL")
+          )
+        );
+      }),
+      React.createElement("button",{onClick:function(){setElapsed(0);setRunning(true);setPhase("racing");notify("Race started","info");},style:{width:"100%",padding:"16px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:12,color:C.goldBright,fontSize:16,fontWeight:700,cursor:"pointer",marginTop:8,letterSpacing:"0.1em",fontFamily:"'Oswald',sans-serif"}},"START "+ev.short.toUpperCase())
+    )
+  );
+
+  return React.createElement("div",{style:{position:"absolute",inset:0,background:C.black,zIndex:40,display:"flex",flexDirection:"column"}},
+    React.createElement(ToastLayer,{notifs:notifs}),
+    React.createElement("div",{style:{background:C.black,paddingTop:52,paddingBottom:12,paddingLeft:18,paddingRight:18,borderBottom:"1px solid "+C.cardBorder,flexShrink:0}},
+      React.createElement("div",{style:{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(to right,"+C.goldDim+","+C.goldBright+","+C.goldDim+")"}}),
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:10}},
+        React.createElement("button",{onClick:function(){setRunning(false);setPhase("setup");setAdMap({});setFinCount(0);setSaved(false);},style:{background:"none",border:"none",cursor:"pointer"}},React.createElement(Icon,{n:"back",size:20,color:C.muted})),
+        React.createElement("div",{style:{flex:1}},
+          React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em"}},ev.label.toUpperCase()),
+          React.createElement("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},function(){var mn=meets.filter(function(m){return m.id===meetId;})[0];return mn?mn.name:"Live Race";}())
+        ),
+        React.createElement("div",{style:{fontSize:9,color:C.goldBright,fontFamily:"'Oswald',sans-serif"}},finCount+" FINISHED")
+      ),
+      React.createElement("div",{style:{textAlign:"center",marginBottom:10}},
+        React.createElement("div",{style:{fontSize:48,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:running?C.goldBright:C.muted,letterSpacing:"0.04em",lineHeight:1}},ms2t(elapsed)),
+        React.createElement("div",{style:{display:"flex",gap:8,justifyContent:"center",marginTop:10}},
+          !running
+            ?React.createElement("button",{onClick:function(){setRunning(true);},style:{padding:"9px 24px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:9,color:C.goldBright,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Oswald',sans-serif"}},"RESUME")
+            :React.createElement("button",{onClick:function(){setRunning(false);},style:{padding:"9px 24px",background:"#8B1A1A",border:"none",borderRadius:9,color:C.white,fontSize:13,fontWeight:700,cursor:"pointer"}},"PAUSE"),
+          React.createElement("button",{onClick:function(){setRunning(false);setElapsed(0);setPhase("setup");setAdMap({});setFinCount(0);setSaved(false);},style:{padding:"9px 16px",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:9,color:C.muted,fontSize:13,cursor:"pointer"}},"RESET")
+        )
+      )
+    ),
+    React.createElement("div",{style:{flex:1,overflowY:"auto",padding:"12px 14px"}},
+      running&&React.createElement("div",{style:{background:C.goldBright+"18",border:"1px solid "+C.goldBright+"44",borderRadius:8,padding:10,marginBottom:12,textAlign:"center"}},React.createElement("div",{style:{fontSize:11,color:C.goldBright,fontFamily:"'Oswald',sans-serif"}},"Tap checkpoint button when athlete reaches that point")),
+      roster.map(function(a){
+        var ad=adMap[a.id]||{goalSec:null,splits:[],done:false,place:null};
+        var cp=nextCp(a.id);
+        var finSplit=ad.splits.filter(function(s){return s.cpId==="finish";})[0];
+        var midSplit=ad.splits.filter(function(s){return s.cpId!=="finish";})[0];
+        var pr=a[ev.prKey];var goalStr=ad.goalSec?s2t(ad.goalSec):"--";
+        var metGoal=ad.done&&ad.goalSec&&finSplit?(finSplit.ms/1000)<=ad.goalSec*1.005:null;
+        var paceBreak=null;
+        if(finSplit&&midSplit&&evKey==="3K XC"){var mileSec=midSplit.ms/1000;var totalSec=finSplit.ms/1000;paceBreak={mile1:mileSec,seg2:(totalSec-mileSec)/0.864,overall:totalSec/1.864};}
+        return React.createElement("div",{key:a.id,style:{background:C.card,border:"1px solid "+(ad.done?C.goldBright:C.cardBorder)+"44",borderRadius:14,padding:"14px 14px",marginBottom:10,position:"relative",overflow:"hidden"}},
+          ad.done&&React.createElement("div",{style:{position:"absolute",left:0,top:0,bottom:0,width:3,background:C.goldBright}}),
+          React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:10}},
+            React.createElement(Avatar,{athlete:a,size:42}),
+            React.createElement("div",{style:{flex:1}},
+              React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:3}},
+                ad.done&&React.createElement("div",{style:{fontSize:13,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright}},"#"+ad.place),
+                React.createElement("div",{style:{fontSize:15,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:ad.done?C.offWhite:C.white}},a.short_name||a.name),
+                React.createElement(Stars,{a:a})
+              ),
+              React.createElement("div",{style:{display:"flex",gap:10}},
+                React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"PR: ",React.createElement("span",{style:{color:C.white,fontWeight:700}},pr||"--")),
+                React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"Goal: ",React.createElement("span",{style:{color:C.goldBright,fontWeight:700}},goalStr))
+              )
+            ),
+            !ad.done&&cp&&running&&React.createElement("button",{onClick:function(){tapAthlete(a);},style:{padding:"10px 14px",background:cp.id==="finish"?"linear-gradient(135deg,"+C.gold+","+C.goldBright+")":"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+(cp.id==="finish"?C.goldBright:C.gold+"66"),borderRadius:9,cursor:"pointer",minWidth:84,fontFamily:"'Oswald',sans-serif",textAlign:"center"}},
+              React.createElement("div",{style:{fontSize:9,color:cp.id==="finish"?C.black:C.muted,letterSpacing:"0.1em",marginBottom:2}},"TAP AT"),
+              React.createElement("div",{style:{fontSize:11,fontWeight:700,color:cp.id==="finish"?C.black:C.goldBright}},cp.label.toUpperCase())
+            ),
+            ad.done&&finSplit&&React.createElement("div",{style:{textAlign:"right"}},
+              React.createElement("div",{style:{fontSize:22,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright}},finSplit.timeStr),
+              React.createElement("div",{style:{fontSize:9,color:metGoal?C.goldBright:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.1em"}},metGoal?"GOAL MET":"FINISHED")
+            )
+          ),
+          metGoal!==null&&finSplit&&React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,padding:"6px 10px",background:(metGoal?C.goldBright:C.red)+"15",border:"1px solid "+(metGoal?C.goldBright:C.red)+"33",borderRadius:8,marginBottom:ad.splits.length>0?8:0}},
+            React.createElement("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"Goal: "+goalStr),
+            React.createElement("div",{style:{flex:1}}),
+            React.createElement("div",{style:{fontSize:11,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:metGoal?C.goldBright:C.red}},metGoal?"GOAL MET":"GOAL MISSED")
+          ),
+          ad.splits.length>0&&React.createElement("div",{style:{borderTop:"1px solid "+C.cardBorder,paddingTop:10}},
+            ad.splits.filter(function(s){return s.cpId!=="finish";}).map(function(s){
+              return React.createElement("div",{key:s.cpId,style:{display:"flex",alignItems:"center",gap:8,marginBottom:8}},
+                React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",width:72,letterSpacing:"0.1em"}},s.label.toUpperCase()),
+                React.createElement("div",{style:{fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,flex:1}},s.timeStr),
+                s.status==="ahead"&&React.createElement("div",{style:{padding:"3px 8px",background:C.goldBright+"18",border:"1px solid "+C.goldBright+"44",borderRadius:6,fontSize:9,color:C.goldBright,fontFamily:"'Oswald',sans-serif"}},"AHEAD"),
+                s.status==="on"&&React.createElement("div",{style:{padding:"3px 8px",background:C.gold+"18",border:"1px solid "+C.gold+"44",borderRadius:6,fontSize:9,color:C.gold,fontFamily:"'Oswald',sans-serif"}},"ON PACE"),
+                s.projMs&&React.createElement("div",{style:{fontSize:13,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright}},"Proj: "+s2t(s.projMs/1000))
+              );
+            }),
+            paceBreak&&React.createElement("div",{style:{marginTop:4}},
+              React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginBottom:8}},"PACING BREAKDOWN"),
+              React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}},
+                [{l:"1ST MILE",v:s2t(paceBreak.mile1),c:C.goldBright},{l:"LAST .86mi",v:s2t(paceBreak.seg2),c:paceBreak.seg2<paceBreak.mile1?C.greenLight:C.alert},{l:"OVERALL",v:s2t(paceBreak.overall),c:C.gold}].map(function(p){
+                  return React.createElement("div",{key:p.l,style:{background:C.subtle,borderRadius:8,padding:"8px 6px",textAlign:"center"}},
+                    React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.1em",marginBottom:4}},p.l),
+                    React.createElement("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:p.c}},p.v),
+                    React.createElement("div",{style:{fontSize:8,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"pace/mi")
+                  );
+                })
+              )
+            )
+          )
+        );
+      }),
+      finCount>0&&!running&&React.createElement("div",{style:{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:14,padding:16,marginTop:8}},
+        React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:12}},"SAVE TO DATABASE"),
+        !meetId&&React.createElement("div",{style:{fontSize:12,color:C.alert,fontFamily:"'Oswald',sans-serif",marginBottom:10}},"Select a meet first"),
+        saved
+          ?React.createElement("div",{style:{padding:"12px",background:C.goldBright+"18",border:"1px solid "+C.goldBright+"55",borderRadius:8,textAlign:"center",fontSize:13,color:C.goldBright,fontFamily:"'Oswald',sans-serif"}},"Results saved and PRs updated")
+          :React.createElement("button",{onClick:saveAll,disabled:!meetId||saving,style:{width:"100%",padding:"13px",background:meetId?"linear-gradient(135deg,#1A1000,#2A1800)":C.subtle,border:"1px solid "+(meetId?C.goldBright:C.cardBorder),borderRadius:10,color:meetId?C.goldBright:C.muted,fontSize:14,fontWeight:700,cursor:meetId?"pointer":"default",fontFamily:"'Oswald',sans-serif",opacity:meetId?1:0.4}},saving?"SAVING...":"SAVE RESULTS + UPDATE PRs")
+      )
+    )
+  );
+}
+
+
+function useGroqRecap(meet,athletes,results){
+  var _r=useState(null);var recap=_r[0];var setRecap=_r[1];
+  var _l=useState(false);var loading=_l[0];var setLoading=_l[1];
+  useEffect(function(){
+    if(!meet||meet.status!=="done")return;
+    setLoading(true);
+    var meetResults=results.filter(function(r){return r.meet_id===meet.id&&r.time&&r.time.indexOf("_split")===-1;}).map(function(r){var ath=athletes.filter(function(a){return a.id===r.athlete_id;})[0];return Object.assign({},r,{athlete:ath});}).sort(function(a,b){return (a.place||99)-(b.place||99);});
+    var topBoys=meetResults.filter(function(r){return r.athlete&&r.athlete.gender==="boys";}).slice(0,5);
+    var topGirls=meetResults.filter(function(r){return r.athlete&&r.athlete.gender==="girls";}).slice(0,5);
+    var prompt="Write a 3-sentence school announcement about a cross country meet. Excited tone, school pride, mention athletes by full name. Meet: "+meet.name+" on "+meet.date+(meet.location?" at "+meet.location:"")+". Boys: "+(meet.boys_place?""+meet.boys_place+"th place"+(meet.boys_points?" "+meet.boys_points+" pts":""):"no team score")+". Girls: "+(meet.girls_place?""+meet.girls_place+"th place"+(meet.girls_points?" "+meet.girls_points+" pts":""):"no team score")+". Top boys: "+topBoys.map(function(r){return (r.athlete?r.athlete.name:"unknown")+" ("+r.time+", #"+r.place+")";}).join(", ")+". Top girls: "+topGirls.map(function(r){return (r.athlete?r.athlete.name:"unknown")+" ("+r.time+", #"+r.place+")";}).join(", ")+". School: Benton Central, nickname: The Herd. Under 80 words. No quotes around text.";
+    fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+GROQ_KEY},body:JSON.stringify({model:"llama3-8b-8192",messages:[{role:"user",content:prompt}],max_tokens:200,temperature:0.7})})
+      .then(function(r){return r.json();})
+      .then(function(d){var text=d.choices&&d.choices[0]&&d.choices[0].message?d.choices[0].message.content:"";setRecap(text);})
+      .catch(function(){})
+      .finally(function(){setLoading(false);});
+  },[meet&&meet.id]);
+  return {recap:recap,loading:loading};
+}
+
+function MeetRecapCard(props){
+  var meet=props.meet;var athletes=props.athletes;var results=props.results;var onViewAthlete=props.onViewAthlete;
+  var rg=useGroqRecap(meet,athletes,results);var recap=rg.recap;var loading=rg.loading;
+  var _pi=useState(0);var photoIdx=_pi[0];var setPhotoIdx=_pi[1];
+  var photos=meet.photos?meet.photos.split(",").filter(Boolean):[];
+  useEffect(function(){
+    if(photos.length<=1)return;
+    var t=setInterval(function(){setPhotoIdx(function(i){return (i+1)%photos.length;});},4000);
+    return function(){clearInterval(t);};
+  },[photos.length]);
+  function renderRecap(text){
+    if(!text)return null;
+    var parts=[];var remaining=text;
+    athletes.forEach(function(a){
+      var name=a.name;if(remaining.indexOf(name)===-1)return;
+      var idx=remaining.indexOf(name);
+      if(idx>0)parts.push({type:"text",val:remaining.slice(0,idx)});
+      parts.push({type:"link",val:name,athlete:a});
+      remaining=remaining.slice(idx+name.length);
+    });
+    parts.push({type:"text",val:remaining});
+    return parts.map(function(p,i){
+      if(p.type==="link")return React.createElement("span",{key:i,onClick:function(){onViewAthlete(p.athlete);},style:{color:C.goldBright,fontWeight:700,textDecoration:"underline",cursor:"pointer",textDecorationColor:C.goldDim}},p.val);
+      return React.createElement("span",{key:i},p.val);
+    });
+  }
+  var suffix=function(n){return n===1?"st":n===2?"nd":n===3?"rd":"th";};
+  return React.createElement("div",{style:{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:14,overflow:"hidden",marginBottom:16}},
+    photos.length>0&&React.createElement("div",{style:{position:"relative",height:160,overflow:"hidden",background:C.subtle}},
+      React.createElement("img",{src:photos[photoIdx],alt:"Meet photo",style:{width:"100%",height:"100%",objectFit:"cover",transition:"opacity 0.5s"}}),
+      photos.length>1&&React.createElement("div",{style:{position:"absolute",bottom:8,left:0,right:0,display:"flex",justifyContent:"center",gap:4}},
+        photos.map(function(_,i){return React.createElement("div",{key:i,style:{width:i===photoIdx?16:6,height:6,borderRadius:3,background:i===photoIdx?C.goldBright:C.muted,transition:"all 0.3s"}});})
+      )
+    ),
+    React.createElement("div",{style:{padding:16}},
+      React.createElement("div",{style:{fontSize:9,color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.3em",marginBottom:6}},"LAST MEET RECAP"),
+      React.createElement("div",{style:{fontSize:18,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,marginBottom:4}},meet.name),
+      React.createElement("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:12}},meet.date+(meet.location?" - "+meet.location:"")),
+      (meet.boys_place||meet.girls_place)&&React.createElement("div",{style:{display:"flex",gap:8,marginBottom:12}},
+        meet.boys_place&&React.createElement("div",{style:{flex:1,background:"linear-gradient(135deg,#1A1000,"+C.subtle+")",border:"1px solid "+C.gold+"44",borderRadius:10,padding:"10px 12px",textAlign:"center"}},
+          React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginBottom:4}},"BOYS"),
+          React.createElement("div",{style:{fontSize:28,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright}},meet.boys_place,React.createElement("span",{style:{fontSize:13}},suffix(meet.boys_place))),
+          meet.boys_points&&React.createElement("div",{style:{fontSize:10,color:C.gold,fontFamily:"'Oswald',sans-serif"}},meet.boys_points+" pts")
+        ),
+        meet.girls_place&&React.createElement("div",{style:{flex:1,background:"linear-gradient(135deg,#1A1000,"+C.subtle+")",border:"1px solid "+C.gold+"44",borderRadius:10,padding:"10px 12px",textAlign:"center"}},
+          React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginBottom:4}},"GIRLS"),
+          React.createElement("div",{style:{fontSize:28,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright}},meet.girls_place,React.createElement("span",{style:{fontSize:13}},suffix(meet.girls_place))),
+          meet.girls_points&&React.createElement("div",{style:{fontSize:10,color:C.gold,fontFamily:"'Oswald',sans-serif"}},meet.girls_points+" pts")
+        )
+      ),
+      loading&&React.createElement("div",{style:{fontSize:12,color:C.muted,fontFamily:"'Oswald',sans-serif",fontStyle:"italic",padding:"8px 0"}},"Generating recap..."),
+      recap&&React.createElement("div",{style:{fontSize:13,color:C.offWhite,fontFamily:"Georgia,serif",fontStyle:"italic",lineHeight:1.7,padding:"10px 0",borderTop:"1px solid "+C.cardBorder}},renderRecap(recap))
+    )
+  );
+}
+
+function MyAthleteCard(props){
+  var athlete=props.athlete;var meets=props.meets;var results=props.results;var onView=props.onView;
+  var next=meets.filter(function(m){return m.status==="next";})[0];
+  var goalSec=next?calcGoal(athlete,"3K XC"):null;
+  var weather=useWeather(next&&next.city,next&&next.date);
+  var _ai=useState(false);var showAlert=_ai[0];var setShowAlert=_ai[1];
+  var _ph=useState(athlete.parent_phone||"");var phone=_ph[0];var setPhone=_ph[1];
+  var _sv=useState(false);var saving=_sv[0];var setSaving=_sv[1];
+  function savePhone(){
+    setSaving(true);
+    db.patch("athletes",athlete.id,{parent_phone:phone}).then(function(){setSaving(false);setShowAlert(false);});
+  }
+  return React.createElement("div",{style:{background:"linear-gradient(135deg,#1A1000,"+C.card+")",border:"1px solid "+C.gold+"55",borderRadius:14,padding:16,marginBottom:10}},
+    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:12}},
+      React.createElement(Avatar,{athlete:athlete,size:52,border:true}),
+      React.createElement("div",{style:{flex:1}},
+        React.createElement("div",{style:{fontSize:18,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},athlete.name),
+        React.createElement("div",{style:{fontSize:10,color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.15em",marginTop:2}},"GRADE "+athlete.grade+" - "+(athlete.gender==="boys"?"BOYS":"GIRLS")+" XC"),
+        athlete.badge&&React.createElement("div",{style:{display:"inline-block",marginTop:5,padding:"2px 8px",background:C.gold+"22",border:"1px solid "+C.gold+"44",borderRadius:4,fontSize:9,color:C.goldBright,fontFamily:"'Oswald',sans-serif"}},athlete.badge)
+      ),
+      React.createElement("button",{onClick:function(){onView(athlete);},style:{padding:"6px 12px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:8,color:C.goldBright,fontSize:10,fontFamily:"'Oswald',sans-serif",cursor:"pointer",fontWeight:700}},"PROFILE")
+    ),
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:12}},
+      React.createElement("div",{style:{background:C.black+"88",borderRadius:8,padding:"8px 10px"}},
+        React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.15em",marginBottom:3}},"CURRENT PR"),
+        React.createElement("div",{style:{fontSize:20,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright}},athlete.pr_3k||"--")
+      ),
+      React.createElement("div",{style:{background:C.black+"88",borderRadius:8,padding:"8px 10px"}},
+        React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.15em",marginBottom:3}},"NEXT MEET GOAL"),
+        React.createElement("div",{style:{fontSize:20,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.gold}},goalSec?s2t(goalSec):"--")
+      )
+    ),
+    next&&React.createElement("div",{style:{background:C.black+"66",borderRadius:8,padding:"10px 12px",marginBottom:12}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}},
+        React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em"}},"NEXT MEET"),
+        (next.location||next.city)&&React.createElement("button",{onClick:function(){var q=encodeURIComponent((next.location||"")+((next.location&&next.city)?", ":"")+(next.city||""));window.open("https://maps.google.com/?q="+q,"_blank");},style:{display:"flex",alignItems:"center",gap:4,padding:"4px 10px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:6,color:C.goldBright,fontSize:10,fontFamily:"'Oswald',sans-serif",cursor:"pointer",fontWeight:700}},
+          React.createElement(Icon,{n:"pin",size:10,color:C.goldBright,sw:2}),
+          "DIRECTIONS"
+        )
+      ),
+      React.createElement("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,marginBottom:4}},next.name),
+      React.createElement("div",{style:{display:"flex",gap:12,flexWrap:"wrap"}},
+        next.date&&React.createElement("div",{style:{fontSize:11,color:C.offWhite,fontFamily:"'Oswald',sans-serif"}},next.date),
+        next.start_time&&React.createElement("div",{style:{fontSize:11,color:C.offWhite,fontFamily:"'Oswald',sans-serif"}},"Start: "+next.start_time),
+        next.bus_time&&React.createElement("div",{style:{fontSize:11,color:C.goldBright,fontFamily:"'Oswald',sans-serif"}},"Bus: "+next.bus_time)
+      ),
+      weather&&React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginTop:10,padding:"8px 10px",background:C.subtle,borderRadius:8}},
+        React.createElement(WeatherIcon,{icon:weather.icon,size:26}),
+        React.createElement("div",null,
+          React.createElement("div",{style:{fontSize:12,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},weather.high+"F / "+weather.low+"F"),
+          React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",textTransform:"capitalize"}},weather.desc)
+        ),
+        next.city&&React.createElement("div",{style:{marginLeft:"auto",fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif"}},next.city)
+      )
+    ),
+    !showAlert
+      ?React.createElement("button",{onClick:function(){setShowAlert(true);},style:{width:"100%",padding:"8px",background:athlete.parent_phone?"transparent":"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+(athlete.parent_phone?C.cardBorder:C.goldBright),borderRadius:8,color:athlete.parent_phone?C.muted:C.goldBright,fontSize:11,fontFamily:"'Oswald',sans-serif",cursor:"pointer"}},athlete.parent_phone?"Alerts active - tap to update":"Sign up for in-app alerts")
+      :React.createElement("div",{style:{display:"flex",gap:8}},
+        React.createElement("input",{placeholder:"Your phone number",value:phone,onChange:function(e){setPhone(e.target.value);},style:{flex:1,padding:"8px 10px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.white,fontFamily:"'Oswald',sans-serif",fontSize:12}}),
+        React.createElement("button",{onClick:savePhone,disabled:saving,style:{padding:"8px 14px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:8,color:C.goldBright,fontSize:11,fontFamily:"'Oswald',sans-serif",cursor:"pointer"}},saving?"...":"SAVE"),
+        React.createElement("button",{onClick:function(){setShowAlert(false);},style:{padding:"8px 10px",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.muted,fontSize:11,cursor:"pointer"}},"X")
+      )
+  );
+}
+
+function HomeTab(props){
+  var athletes=props.athletes;var meets=props.meets;var favIds=props.favIds;var onOpenSelector=props.onOpenSelector;var logoUrl=props.logoUrl;var results=props.results;var onViewAthlete=props.onViewAthlete;
+  var favAthletes=athletes.filter(function(a){return favIds.indexOf(a.id)!==-1;});
+  var lastMeet=meets.filter(function(m){return m.status==="done";}).sort(function(a,b){return new Date(b.date||0)-new Date(a.date||0);})[0];
+  return React.createElement("div",{style:{padding:0}},
+    React.createElement("div",{style:{background:"linear-gradient(180deg,#0A0800,"+C.black+")",padding:"20px 18px 16px",borderBottom:"1px solid "+C.cardBorder,position:"relative"}},
+      React.createElement("div",{style:{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(to right,"+C.goldDim+","+C.goldBright+","+C.goldDim+")"}}),
+      React.createElement("div",{style:{fontSize:9,color:C.goldDim,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.4em",marginBottom:4}},"FALL 2026"),
+      React.createElement("div",{style:{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,lineHeight:1}},"THE HERD"),
+      React.createElement("div",{style:{fontSize:11,color:C.gold,fontFamily:"'Oswald',sans-serif",fontStyle:"italic",marginTop:5,letterSpacing:"0.15em"}},"BUILT IN BENTON")
+    ),
+    React.createElement("div",{style:{padding:"14px 14px"}},
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}},
+        React.createElement("div",{style:{fontSize:10,color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.3em",fontWeight:700}},"MY ATHLETE(S)"),
+        React.createElement("button",{onClick:onOpenSelector,style:{background:"none",border:"1px solid "+C.cardBorder,borderRadius:8,padding:"4px 10px",color:C.muted,fontSize:10,cursor:"pointer",fontFamily:"'Oswald',sans-serif"}},"+ ADD")
+      ),
+      favAthletes.length===0
+        ?React.createElement("div",{style:{background:C.card,border:"1px dashed "+C.cardBorder,borderRadius:12,padding:20,textAlign:"center",marginBottom:16}},
+          React.createElement("div",{style:{fontSize:13,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:10}},"Tap + Add to follow your athlete"),
+          React.createElement("button",{onClick:onOpenSelector,style:{padding:"8px 18px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:8,color:C.goldBright,fontSize:12,cursor:"pointer",fontWeight:700,fontFamily:"'Oswald',sans-serif"}},"SELECT ATHLETE")
+        )
+        :favAthletes.map(function(a){return React.createElement(MyAthleteCard,{key:a.id,athlete:a,meets:meets,results:results,onView:onViewAthlete});}),
+      lastMeet&&React.createElement(MeetRecapCard,{meet:lastMeet,athletes:athletes,results:results,onViewAthlete:onViewAthlete}),
+      React.createElement("div",{style:{background:"linear-gradient(135deg,#180E00,"+C.card+")",border:"1px solid "+C.gold+"44",borderRadius:14,padding:16,marginBottom:16}},
+        React.createElement("div",{style:{fontSize:9,color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.35em",marginBottom:8}},"TEAM APPAREL"),
+        React.createElement("div",{style:{fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,marginBottom:4}},"BC Track and XC Store"),
+        React.createElement("div",{style:{fontSize:12,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:12}},"Official team gear - BSN Sports"),
+        React.createElement("button",{onClick:function(){window.open("https://bsnsports.com","_blank");},style:{padding:"8px 18px",background:"linear-gradient(135deg,"+C.gold+","+C.goldBright+")",border:"none",borderRadius:8,color:C.black,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Oswald',sans-serif",letterSpacing:"0.1em"}},"SHOP NOW")
+      ),
+      React.createElement("div",{style:{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:14,padding:14,marginBottom:16,overflow:"hidden"}},
+        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:12}},
+          React.createElement(Icon,{n:"fb",size:16,color:C.goldBright}),
+          React.createElement("div",{style:{fontSize:10,color:C.goldBright,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",fontWeight:700}},"TEAM UPDATES")
+        ),
+        React.createElement("div",{style:{borderRadius:8,overflow:"hidden",background:"#fff"},dangerouslySetInnerHTML:{__html:'<div class="fb-page" data-href="'+FB_PAGE+'" data-tabs="timeline" data-width="350" data-height="400" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="false"></div>'}}),
+        React.createElement("button",{onClick:function(){window.open(FB_PAGE,"_blank");},style:{width:"100%",marginTop:10,padding:"8px",background:"transparent",border:"1px solid "+C.cardBorder,borderRadius:8,color:C.muted,fontSize:11,fontFamily:"'Oswald',sans-serif",cursor:"pointer"}},"Open on Facebook")
+      )
+    )
+  );
+}
+
+function AthletesTab(props){
+  var athletes=props.athletes;var onView=props.onView;var favIds=props.favIds;var onToggleFav=props.onToggleFav;
+  var _g=useState("boys");var gender=_g[0];var setGender=_g[1];
+  var V=6;
+  var list=athletes.filter(function(a){return a.gender===gender;}).sort(function(a,b){return t2s(a.pr_3k||"99:99")-t2s(b.pr_3k||"99:99");});
+  return React.createElement("div",{style:{padding:"20px 16px"}},
+    React.createElement("div",{style:{marginBottom:14}},
+      React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em"}},"TEAM STANDINGS"),
+      React.createElement("div",{style:{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"THE HERD")
+    ),
+    React.createElement("div",{style:{display:"flex",background:C.card,borderRadius:10,padding:3,border:"1px solid "+C.cardBorder,marginBottom:14}},
+      ["boys","girls"].map(function(g){return React.createElement("button",{key:g,onClick:function(){setGender(g);},style:{flex:1,padding:"9px 0",background:gender===g?"linear-gradient(135deg,#1A1000,#2A1800)":"transparent",border:"none",borderRadius:8,color:gender===g?C.goldBright:C.muted,fontSize:12,cursor:"pointer",fontWeight:gender===g?700:400,fontFamily:"'Oswald',sans-serif"}},g.toUpperCase());})
+    ),
+    list.map(function(a,i){
+      return React.createElement("div",{key:a.id},
+        i===V&&React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,margin:"6px 0 10px"}},
+          React.createElement("div",{style:{flex:1,height:1,background:C.gold}}),
+          React.createElement("div",{style:{fontSize:9,color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",whiteSpace:"nowrap"}},"VARSITY CUT LINE"),
+          React.createElement("div",{style:{flex:1,height:1,background:C.gold}})
+        ),
+        React.createElement("button",{onClick:function(){onView(a);},style:{width:"100%",display:"flex",alignItems:"center",background:C.card,borderRadius:11,border:"1px solid "+C.cardBorder,padding:"11px 12px",marginBottom:8,cursor:"pointer",textAlign:"left",opacity:i>=V?0.75:1}},
+          React.createElement("div",{style:{width:24,fontSize:13,color:i<3?C.goldBright:C.muted,fontFamily:"'Oswald',sans-serif",fontWeight:700}},i+1),
+          React.createElement("button",{onClick:function(e){e.stopPropagation();onToggleFav(a.id);},style:{background:"none",border:"none",cursor:"pointer",marginRight:6,flexShrink:0}},
+            React.createElement("svg",{width:16,height:16,viewBox:"0 0 24 24",fill:favIds.indexOf(a.id)!==-1?C.goldBright:"none",stroke:favIds.indexOf(a.id)!==-1?C.goldBright:C.muted,strokeWidth:"2"},React.createElement("polygon",{points:"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"}))
+          ),
+          React.createElement(Avatar,{athlete:a,size:34}),
+          React.createElement("div",{style:{flex:1,marginLeft:8}},
+            React.createElement("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}},a.short_name||a.name),
+            React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:1}},"GR "+a.grade)
+          ),
+          React.createElement("div",{style:{marginRight:10,fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},a.pr_3k||"--"),
+          React.createElement("div",{style:{fontSize:12,color:C.goldBright,fontFamily:"'Oswald',sans-serif"}},a.pr_3k?s2t(t2s(a.pr_3k)*0.984):"--")
+        )
+      );
+    })
+  );
+}
+
+function AthleteProfile(props){
+  var athlete=props.athlete;var results=props.results;var meets=props.meets;var onBack=props.onBack;var isFav=props.isFav;var onToggleFav=props.onToggleFav;
+  var _s=useState("overview");var sub=_s[0];var setSub=_s[1];
+  var a=athlete;
+  var baseline=a.pr_baseline||a.pr_3k;
+  var paces=calcPaces(baseline);
+  var allR=results.filter(function(r){return r.athlete_id===a.id;});
+  var myR=allR.filter(function(r){return r.time&&r.time.indexOf("_split")===-1;}).map(function(r){var mt=meets.filter(function(m){return m.id===r.meet_id;})[0];return Object.assign({},r,{meet:mt});}).sort(function(x,y){return new Date(safeGet(x.meet,"date")||0)-new Date(safeGet(y.meet,"date")||0);});
+  var proj=calcProjections(a,results,meets);
+  var ageMap={6:11,7:12,8:13,9:14,10:15,11:16,12:17};
+  var age=ageMap[a.grade]||(a.grade+5);
+  var tabs=["overview","paces","meets","projections"];
+  return React.createElement("div",{style:{display:"flex",flexDirection:"column",height:"100%"}},
+    React.createElement("div",{style:{background:"linear-gradient(160deg,#0A0800,"+C.black+")",paddingTop:58,paddingBottom:0,paddingLeft:18,paddingRight:18,borderBottom:"1px solid "+C.cardBorder,position:"relative",overflow:"hidden"}},
+      React.createElement("div",{style:{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(to right,"+C.goldDim+","+C.goldBright+","+C.goldDim+")"}}),
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:14}},
+        React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer"}},React.createElement(Icon,{n:"back",size:22,color:C.muted})),
+        React.createElement("div",{style:{flex:1,fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em"}},"ATHLETE PROFILE"),
+        React.createElement("button",{onClick:function(){onToggleFav(a.id);},style:{background:"none",border:"none",cursor:"pointer"}},
+          React.createElement("svg",{width:22,height:22,viewBox:"0 0 24 24",fill:isFav?C.goldBright:"none",stroke:isFav?C.goldBright:C.muted,strokeWidth:"2"},React.createElement("polygon",{points:"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"}))
+        )
+      ),
+      React.createElement("div",{style:{display:"flex",alignItems:"flex-end",gap:14,paddingBottom:14}},
+        React.createElement(Avatar,{athlete:a,size:64,border:true}),
+        React.createElement("div",{style:{flex:1}},
+          React.createElement("div",{style:{fontSize:22,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,lineHeight:1.1}},a.name),
+          React.createElement("div",{style:{fontSize:11,color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.1em",marginTop:3}},"GRADE "+a.grade+" - AGE "+age+" - "+(a.gender==="boys"?"BOYS":"GIRLS")+" XC"),
+          a.badge&&React.createElement("div",{style:{display:"inline-block",marginTop:6,padding:"3px 10px",background:C.gold+"22",border:"1px solid "+C.gold+"55",borderRadius:6,fontSize:10,color:C.goldBright,fontFamily:"'Oswald',sans-serif"}},a.badge)
+        )
+      ),
+      React.createElement("div",{style:{display:"flex",borderTop:"1px solid "+C.cardBorder,marginLeft:-18,marginRight:-18}},
+        tabs.map(function(t){return React.createElement("button",{key:t,onClick:function(){setSub(t);},style:{flex:1,padding:"10px 0",background:"none",border:"none",borderBottom:sub===t?"2px solid "+C.goldBright:"2px solid transparent",color:sub===t?C.goldBright:C.muted,fontFamily:"'Oswald',sans-serif",fontSize:9,letterSpacing:"0.1em",cursor:"pointer",textTransform:"uppercase"}},t);})
+      )
+    ),
+    React.createElement("div",{style:{flex:1,overflowY:"auto"}},
+      sub==="overview"&&React.createElement("div",{style:{padding:"18px 16px"}},
+        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}},
+          [{l:"3K PR",v:a.pr_3k||"--",ac:C.goldBright},{l:"BASELINE MILE",v:a.pr_baseline||"--",ac:C.gold},{l:"ATTENDANCE",v:(a.attendance||100)+"%",ac:C.goldDim},{l:"WEEKLY MI",v:(a.weekly_mileage||0)+"mi",ac:C.muted}].map(function(s){
+            return React.createElement("div",{key:s.l,style:{background:C.card,borderRadius:12,padding:"14px 14px",border:"1px solid "+C.cardBorder,position:"relative",overflow:"hidden"}},
+              React.createElement("div",{style:{position:"absolute",top:0,left:0,right:0,height:2,background:s.ac}}),
+              React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginBottom:6}},s.l),
+              React.createElement("div",{style:{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,lineHeight:1}},s.v)
+            );
+          })
+        ),
+        proj&&React.createElement("div",{style:{background:"linear-gradient(135deg,#180E00,"+C.card+")",border:"1px solid "+C.gold+"44",borderRadius:14,padding:14,marginBottom:14}},
+          React.createElement("div",{style:{fontSize:9,color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:10}},"SEASON TRAJECTORY"),
+          React.createElement("div",{style:{fontSize:12,color:C.offWhite,fontFamily:"'Oswald',sans-serif",marginBottom:8}},proj.trending?"Averaging "+proj.avg+"s improvement per meet over "+proj.count+" meets":"Holding steady over "+proj.count+" meets"),
+          [{l:"NEXT MEET",v:proj.nextMeet},{l:"END OF SEASON",v:proj.eos},proj.nextYear?{l:"NEXT YEAR",v:proj.nextYear}:null].filter(Boolean).map(function(p){
+            return React.createElement("div",{key:p.l,style:{display:"flex",justifyContent:"space-between",paddingBottom:6,marginBottom:6,borderBottom:"1px solid "+C.cardBorder+"66"}},
+              React.createElement("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.1em"}},p.l),
+              React.createElement("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright}},p.v)
+            );
+          })
+        ),
+        React.createElement("div",{style:{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:14,padding:16}},
+          React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:12}},"OTHER PRs"),
+          [{l:"1600m",v:a.pr_1600||"--"},{l:"800m",v:a.pr_800||"--"},{l:"5K XC",v:a.pr_5k||"--"}].map(function(r,i,arr){
+            return React.createElement("div",{key:r.l,style:{display:"flex",justifyContent:"space-between",paddingBottom:8,marginBottom:8,borderBottom:i<arr.length-1?"1px solid "+C.cardBorder:"none"}},
+              React.createElement("div",{style:{fontSize:13,color:C.offWhite,fontFamily:"'Oswald',sans-serif"}},r.l),
+              React.createElement("div",{style:{fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},r.v)
+            );
+          })
+        )
+      ),
+      sub==="paces"&&paces&&React.createElement("div",{style:{padding:"18px 16px"}},
+        a.pr_baseline&&React.createElement("div",{style:{background:C.goldBright+"12",border:"1px solid "+C.goldBright+"22",borderRadius:8,padding:"8px 12px",marginBottom:14,fontSize:11,color:C.gold,fontFamily:"'Oswald',sans-serif"}},"Paces based on baseline mile: "+a.pr_baseline),
+        React.createElement("div",{style:{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:14,padding:16}},
+          React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:14}},"TRAINING PACES - DANIELS"),
+          [{l:"EASY",p:paces.easy,c:C.greenLight,d:"Conversational"},{l:"LONG",p:paces.long,c:C.greenLight,d:"Aerobic base"},{l:"THRESHOLD",p:paces.threshold,c:C.goldBright,d:"Comfortably hard"},{l:"INTERVAL",p:paces.interval,c:C.alert,d:"VO2 max reps"},{l:"REPETITION",p:paces.rep,c:C.red,d:"Speed reps"},{l:"RACE PACE",p:paces.race,c:C.white,d:"Goal 3K pace"}].map(function(p,i,arr){
+            return React.createElement("div",{key:p.l,style:{display:"flex",justifyContent:"space-between",alignItems:"center",paddingBottom:12,marginBottom:12,borderBottom:i<arr.length-1?"1px solid "+C.cardBorder:"none"}},
+              React.createElement("div",null,
+                React.createElement("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.15em"}},p.l),
+                React.createElement("div",{style:{fontSize:10,color:"#444",fontFamily:"'Oswald',sans-serif",marginTop:2}},p.d)
+              ),
+              React.createElement("div",{style:{fontSize:22,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:p.c}},p.p,React.createElement("span",{style:{fontSize:11,color:C.muted}},"/mi"))
+            );
+          })
+        )
+      ),
+      sub==="meets"&&React.createElement("div",{style:{padding:"18px 16px"}},
+        React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:14}},"RESULTS WITH GOALS"),
+        myR.length===0
+          ?React.createElement("div",{style:{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:24,textAlign:"center"}},React.createElement("div",{style:{fontSize:13,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"No results yet"))
+          :myR.map(function(r,i){
+            var spl=allR.filter(function(x){return x.time===r.time+"_split"&&x.athlete_id===a.id;})[0];
+            var notes=spl?spl.notes:"";
+            var mm=notes.match(/1 Mile Split:\s*([\d:\.]+)/);var mstr=mm?mm[1]:null;
+            var analysis=null;
+            if(mstr&&r.time){var ms2=t2s(mstr.split(".")[0]);var ts=t2s(r.time);if(ms2<9999&&ts<9999)analysis={mile1:ms2,seg2:(ts-ms2)/0.864,total:ts/1.864};}
+            var metGoal=r.goal_time&&r.time?t2s(r.time)<=t2s(r.goal_time)*1.005:null;
+            var prev=i>0?myR[i-1]:null;
+            return React.createElement("div",{key:r.id,style:{background:C.card,border:"1px solid "+(metGoal===true?C.goldBright+"44":metGoal===false?C.red+"22":C.cardBorder),borderRadius:14,padding:"14px 16px",marginBottom:12}},
+              React.createElement("div",{style:{display:"flex",alignItems:"center",marginBottom:r.goal_time||analysis?10:0}},
+                React.createElement("div",{style:{width:32,height:32,borderRadius:8,background:C.gold+"22",border:"1px solid "+C.gold+"44",display:"flex",alignItems:"center",justifyContent:"center",marginRight:12}},
+                  React.createElement("div",{style:{fontSize:12,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright}},r.place?"#"+r.place:"--")
+                ),
+                React.createElement("div",{style:{flex:1}},
+                  React.createElement("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}},safeGet(r.meet,"name")||"Meet"),
+                  React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:2}},safeGet(r.meet,"date")||"")
+                ),
+                React.createElement("div",{style:{textAlign:"right"}},
+                  React.createElement("div",{style:{fontSize:20,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:i===myR.length-1?C.goldBright:C.white}},r.time),
+                  prev&&function(){var diff=t2s(r.time)-t2s(prev.time);return React.createElement("div",{style:{fontSize:10,color:diff<0?C.greenLight:C.red,fontFamily:"'Oswald',sans-serif"}},diff<0?"up "+Math.abs(diff)+"s":"dn "+Math.abs(diff)+"s");}()
+                )
+              ),
+              r.goal_time&&React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,padding:"6px 10px",background:(metGoal?C.goldBright:C.red)+"15",border:"1px solid "+(metGoal?C.goldBright:C.red)+"33",borderRadius:8,marginBottom:analysis?8:0}},
+                React.createElement("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"Goal: "+r.goal_time),
+                React.createElement("div",{style:{flex:1}}),
+                React.createElement("div",{style:{fontSize:11,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:metGoal?C.goldBright:C.red}},metGoal?"GOAL MET":"GOAL MISSED")
+              ),
+              analysis&&React.createElement("div",{style:{borderTop:"1px solid "+C.cardBorder,paddingTop:10}},
+                React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginBottom:8}},"PACING BREAKDOWN"),
+                React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}},
+                  [{l:"1ST MILE",v:s2t(analysis.mile1),c:C.goldBright},{l:"LAST .86mi",v:s2t(analysis.seg2),c:analysis.seg2<analysis.mile1?C.greenLight:C.alert},{l:"OVERALL",v:s2t(analysis.total),c:C.gold}].map(function(p){
+                    return React.createElement("div",{key:p.l,style:{background:C.subtle,borderRadius:8,padding:"8px 6px",textAlign:"center"}},
+                      React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.1em",marginBottom:4}},p.l),
+                      React.createElement("div",{style:{fontSize:15,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:p.c}},p.v),
+                      React.createElement("div",{style:{fontSize:8,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"pace/mi")
+                    );
+                  })
+                )
+              )
+            );
+          })
+      ),
+      sub==="projections"&&React.createElement("div",{style:{padding:"18px 16px"}},
+        React.createElement("div",{style:{background:"linear-gradient(135deg,#180E00,"+C.card+")",border:"1px solid "+C.gold+"44",borderRadius:14,padding:16}},
+          React.createElement("div",{style:{fontSize:9,color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:10}},"PROJECTIONS"),
+          !proj
+            ?React.createElement("div",{style:{fontSize:13,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"Need at least 3 meet results to generate projections.")
+            :React.createElement("div",null,
+              React.createElement("div",{style:{fontSize:12,color:C.offWhite,fontFamily:"'Oswald',sans-serif",marginBottom:14,lineHeight:1.6}},proj.trending?"Based on "+proj.count+" meets, averaging "+proj.avg+"s improvement per meet.":"Holding steady over "+proj.count+" meets - improvement trend building."),
+              [{l:"NEXT MEET",v:proj.nextMeet,d:"Based on current rate"},{l:"END OF SEASON",v:proj.eos,d:"Remaining meets"},{l:"NEXT YEAR",v:proj.nextYear||"N/A",d:a.grade<=8?"Middle school projection":"HS projection"}].map(function(p,i){
+                return React.createElement("div",{key:p.l,style:{background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:10,padding:"12px 14px",marginBottom:8,display:"flex",alignItems:"center"}},
+                  React.createElement("div",{style:{flex:1}},
+                    React.createElement("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.15em"}},p.l),
+                    React.createElement("div",{style:{fontSize:10,color:"#444",fontFamily:"'Oswald',sans-serif",marginTop:2}},p.d)
+                  ),
+                  React.createElement("div",{style:{fontSize:20,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:i===0?C.goldBright:C.gold}},p.v||"--")
+                );
+              })
+            )
+        )
+      )
+    )
+  );
+}
+
+
+function ScheduleTab(props){
+  var meets=props.meets;
+  return React.createElement("div",{style:{padding:"20px 16px"}},
+    React.createElement("div",{style:{marginBottom:18}},
+      React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em"}},"FALL 2026"),
+      React.createElement("div",{style:{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"SCHEDULE")
+    ),
+    meets.map(function(m){
+      var isNext=m.status==="next",isDone=m.status==="done";
+      var cc=m.course_type==="fast"?C.greenLight:m.course_type==="slow"?C.red:C.muted;
+      var suffix=function(n){return n===1?"st":n===2?"nd":n===3?"rd":"th";};
+      return React.createElement("div",{key:m.id,style:{background:isNext?"linear-gradient(135deg,#180E00,"+C.card+")":C.card,border:"1px solid "+(isNext?C.goldBright+"55":C.cardBorder),borderRadius:14,padding:16,marginBottom:12,opacity:isDone?0.7:1,position:"relative",overflow:"hidden"}},
+        isNext&&React.createElement("div",{style:{position:"absolute",left:0,top:0,bottom:0,width:3,background:C.goldBright}}),
+        isDone&&React.createElement("div",{style:{position:"absolute",left:0,top:0,bottom:0,width:3,background:C.muted}}),
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}},
+          React.createElement("div",null,
+            React.createElement("div",{style:{fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:isNext?C.goldBright:isDone?C.muted:C.white}},m.name+(m.section?" - "+m.section:"")),
+            React.createElement("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:3}},m.date+(m.location?" - "+m.location:"")),
+            m.start_time&&React.createElement("div",{style:{fontSize:11,color:C.offWhite,fontFamily:"'Oswald',sans-serif",marginTop:2}},"Start: "+m.start_time),
+            m.bus_time&&React.createElement("div",{style:{fontSize:11,color:C.goldBright,fontFamily:"'Oswald',sans-serif",marginTop:2}},"Bus: "+m.bus_time)
+          ),
+          React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:6}},
+            isDone?React.createElement("div",{style:{width:28,height:28,borderRadius:"50%",background:C.muted+"33",border:"1px solid "+C.muted,display:"flex",alignItems:"center",justifyContent:"center"}},React.createElement(Icon,{n:"chk",size:14,color:C.muted}))
+              :isNext?React.createElement("div",{style:{padding:"4px 10px",background:C.goldBright+"22",border:"1px solid "+C.goldBright+"55",borderRadius:6,fontSize:10,color:C.goldBright,fontFamily:"'Oswald',sans-serif"}},"NEXT")
+              :React.createElement("div",{style:{padding:"4px 10px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:6,fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"UPCOMING"),
+            (m.location||m.city)&&React.createElement("button",{onClick:function(){var q=encodeURIComponent((m.location||"")+((m.location&&m.city)?", ":"")+(m.city||""));window.open("https://maps.google.com/?q="+q,"_blank");},style:{display:"flex",alignItems:"center",gap:4,padding:"4px 10px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:6,color:C.goldBright,fontSize:10,fontFamily:"'Oswald',sans-serif",cursor:"pointer",fontWeight:700}},
+              React.createElement(Icon,{n:"pin",size:10,color:C.goldBright,sw:2}),
+              "DIRECTIONS"
+            )
+          )
+        ),
+        m.course_note&&React.createElement("div",{style:{padding:"4px 10px",background:cc+"18",border:"1px solid "+cc+"33",borderRadius:6,fontSize:10,color:cc,fontFamily:"'Oswald',sans-serif",display:"inline-block",marginBottom:6}},m.course_note),
+        isDone&&(m.boys_place||m.girls_place)&&React.createElement("div",{style:{display:"flex",gap:10,marginTop:6}},
+          m.boys_place&&React.createElement("div",{style:{padding:"4px 12px",background:C.gold+"18",border:"1px solid "+C.gold+"33",borderRadius:6,fontSize:11,color:C.gold,fontFamily:"'Oswald',sans-serif"}},"Boys: "+m.boys_place+suffix(m.boys_place)+(m.boys_points?" ("+m.boys_points+" pts)":"")),
+          m.girls_place&&React.createElement("div",{style:{padding:"4px 12px",background:C.gold+"18",border:"1px solid "+C.gold+"33",borderRadius:6,fontSize:11,color:C.gold,fontFamily:"'Oswald',sans-serif"}},"Girls: "+m.girls_place+suffix(m.girls_place)+(m.girls_points?" ("+m.girls_points+" pts)":""))
+        )
+      );
+    })
+  );
+}
+
+function TrainTab(props){
+  var workouts=props.workouts;var athletes=props.athletes;
+  var td=DAYS[new Date().getDay()===0?6:new Date().getDay()-1];
+  var _e=useState(td);var exp=_e[0];var setExp=_e[1];
+  var sa=athletes[0];var paces=sa?calcPaces(sa.pr_baseline||sa.pr_3k):null;
+  var sorted=workouts.slice().sort(function(a,b){return DAYS.indexOf(a.day)-DAYS.indexOf(b.day);});
+  function parseSegs(d){if(!d)return[];return d.split(" + ").map(function(raw,i){var pt=PACE_TYPES.filter(function(p){return raw.indexOf(p.label)!==-1;})[0];return{id:i,raw:raw,paceType:pt?pt.id:"easy",color:pt?pt.color:C.muted};});}
+  return React.createElement("div",{style:{padding:"20px 16px"}},
+    React.createElement("div",{style:{marginBottom:16}},
+      React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em"}},"THIS WEEK"),
+      React.createElement("div",{style:{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"TRAINING")
+    ),
+    React.createElement("div",{style:{display:"flex",gap:6,marginBottom:16,overflowX:"auto",paddingBottom:4}},
+      DAYS.map(function(d){
+        var w=sorted.filter(function(x){return x.day===d;})[0];var isT=d===td;
+        var dot=w&&w.type==="hard"?C.red:w&&w.type==="meet"?C.goldBright:w&&w.type==="rest"?C.muted:C.greenLight;
+        return React.createElement("button",{key:d,onClick:function(){setExp(exp===d?null:d);},style:{flexShrink:0,width:44,padding:"10px 0",background:exp===d?"linear-gradient(135deg,#1A1000,"+C.card+")":C.card,border:"1px solid "+(exp===d?C.goldBright:isT?C.gold+"55":C.cardBorder),borderRadius:10,cursor:"pointer",textAlign:"center",position:"relative"}},
+          isT&&React.createElement("div",{style:{position:"absolute",top:4,right:4,width:5,height:5,borderRadius:"50%",background:C.goldBright}}),
+          React.createElement("div",{style:{fontSize:9,color:isT?C.goldBright:C.muted,fontFamily:"'Oswald',sans-serif",fontWeight:700,marginBottom:4}},d),
+          React.createElement("div",{style:{width:8,height:8,borderRadius:"50%",background:w?dot:C.subtle,margin:"0 auto"}})
+        );
+      })
+    ),
+    exp&&function(){
+      var w=sorted.filter(function(x){return x.day===exp;})[0];
+      if(!w)return React.createElement("div",{style:{background:C.card,border:"1px dashed "+C.cardBorder,borderRadius:12,padding:24,textAlign:"center",marginBottom:16}},React.createElement("div",{style:{fontSize:13,color:C.muted,fontFamily:"'Oswald',sans-serif"}},exp+" - No workout posted"));
+      var segs=parseSegs(w.detail);var isMeet=w.type==="meet";var isT=w.day===td;
+      return React.createElement("div",{style:{background:isMeet?"linear-gradient(135deg,#180E00,"+C.card+")":isT?"linear-gradient(135deg,#1A1000,"+C.card+")":C.card,border:"1px solid "+(isMeet?C.goldBright+"55":isT?C.goldBright+"33":C.cardBorder),borderRadius:14,padding:16,marginBottom:16,position:"relative",overflow:"hidden"}},
+        (isT||isMeet)&&React.createElement("div",{style:{position:"absolute",left:0,top:0,bottom:0,width:3,background:C.goldBright}}),
+        React.createElement("div",{style:{paddingLeft:isT||isMeet?8:0}},
+          React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}},
+            React.createElement("div",null,
+              React.createElement("div",{style:{fontSize:18,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:isMeet?C.goldBright:C.white}},w.label),
+              React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:2}},exp+(isT?" - TODAY":""))
+            ),
+            React.createElement("div",{style:{padding:"4px 10px",background:isMeet?C.goldBright+"22":isT?C.gold+"22":C.subtle,border:"1px solid "+(isMeet?C.goldBright+"55":isT?C.gold+"55":C.cardBorder),borderRadius:6,fontSize:10,color:isMeet?C.goldBright:isT?C.gold:C.muted,fontFamily:"'Oswald',sans-serif"}},isMeet?"MEET":isT?"TODAY":w.type.toUpperCase())
+          ),
+          segs.length>0?segs.map(function(s){
+            return React.createElement("div",{key:s.id,style:{display:"flex",alignItems:"center",gap:10,paddingBottom:8,marginBottom:8,borderBottom:"1px solid "+C.cardBorder}},
+              React.createElement("div",{style:{width:8,height:8,borderRadius:"50%",background:s.color,flexShrink:0}}),
+              React.createElement("div",{style:{flex:1,fontSize:13,color:C.white,fontFamily:"'Oswald',sans-serif"}},s.raw),
+              paces&&s.paceType!=="rest"&&React.createElement("div",{style:{fontSize:13,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:s.color}},(paces[s.paceType]||"--"),React.createElement("span",{style:{fontSize:9,color:C.muted}},"/mi"))
+            );
+          }):React.createElement("div",{style:{fontSize:13,color:C.muted,fontFamily:"'Oswald',sans-serif"}},w.detail||"See coach"),
+          paces&&React.createElement("div",{style:{marginTop:10,padding:"10px 12px",background:C.subtle,borderRadius:8}},
+            React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginBottom:8}},"YOUR PACES"),
+            React.createElement("div",{style:{display:"flex",gap:10,flexWrap:"wrap"}},
+              [{k:"easy",l:"EASY",c:C.greenLight},{k:"threshold",l:"THRESH",c:C.goldBright},{k:"interval",l:"INTRVL",c:C.alert},{k:"race",l:"RACE",c:C.white}].map(function(p){
+                return React.createElement("div",{key:p.k,style:{textAlign:"center"}},
+                  React.createElement("div",{style:{fontSize:13,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:p.c}},paces[p.k]||"--"),
+                  React.createElement("div",{style:{fontSize:8,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.1em"}},p.l)
+                );
+              })
+            )
+          ),
+          w.notes&&React.createElement("div",{style:{marginTop:10,fontSize:12,color:C.muted,fontFamily:"'Oswald',sans-serif",fontStyle:"italic"}},"Note: "+w.notes)
+        )
+      );
+    }(),
+    React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:10}},"FULL WEEK"),
+    sorted.length===0
+      ?React.createElement("div",{style:{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:24,textAlign:"center"}},React.createElement("div",{style:{fontSize:13,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"No workouts posted yet"))
+      :sorted.map(function(w){
+        var isMeet=w.type==="meet";var isT=w.day===td;var tc=w.type==="hard"?C.red:w.type==="meet"?C.goldBright:w.type==="rest"?C.muted:C.greenLight;
+        return React.createElement("button",{key:w.id,onClick:function(){setExp(w.day);},style:{width:"100%",display:"flex",alignItems:"center",background:C.card,borderRadius:11,border:"1px solid "+(exp===w.day?C.goldBright:C.cardBorder),padding:"11px 12px",marginBottom:7,cursor:"pointer",textAlign:"left",position:"relative",overflow:"hidden"}},
+          isT&&React.createElement("div",{style:{position:"absolute",left:0,top:0,bottom:0,width:3,background:C.goldBright}}),
+          isMeet&&!isT&&React.createElement("div",{style:{position:"absolute",left:0,top:0,bottom:0,width:3,background:C.gold}}),
+          React.createElement("div",{style:{width:34,textAlign:"center",marginLeft:isT||isMeet?4:0}},React.createElement("div",{style:{fontSize:9,color:isT?C.goldBright:isMeet?C.gold:C.muted,fontFamily:"'Oswald',sans-serif",fontWeight:700}},w.day)),
+          React.createElement("div",{style:{flex:1,paddingLeft:10}},
+            React.createElement("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:isMeet?C.goldBright:C.white}},w.label),
+            React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:200}},w.detail)
+          ),
+          React.createElement("div",{style:{padding:"3px 8px",background:tc+"18",border:"1px solid "+tc+"33",borderRadius:5,fontSize:9,color:tc,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.1em"}},isMeet?"MEET":isT?"TODAY":w.type.toUpperCase())
+        );
+      })
+  );
+}
+
+function RecordsTab(props){
+  var records=props.records;
+  var _g=useState("boys");var gender=_g[0];var setGender=_g[1];
+  var myEv=RECORD_EVENTS.filter(function(e){return e.gender===gender;});
+  function getRecs(id){return records.filter(function(r){return r.event_id===id;}).sort(function(a,b){return a.mark_sortable-b.mark_sortable;});}
+  var xcIds={boys:["xc_3k_6b","xc_3k_7b","xc_3k_8b"],girls:["xc_3k_6g","xc_3k_7g","xc_3k_8g"]};
+  function fastestXC(g){var times=xcIds[g].map(function(id){var r=getRecs(id);return r[0]?r[0].mark_sortable:null;}).filter(Boolean);return times.length>0?Math.min.apply(null,times):null;}
+  var fxcB=fastestXC("boys");var fxcG=fastestXC("girls");
+  return React.createElement("div",{style:{padding:"20px 16px"}},
+    React.createElement("div",{style:{marginBottom:16}},
+      React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em"}},"PROGRAM HISTORY"),
+      React.createElement("div",{style:{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"RECORDS")
+    ),
+    React.createElement("div",{style:{display:"flex",background:C.card,borderRadius:10,padding:3,border:"1px solid "+C.cardBorder,marginBottom:16}},
+      ["boys","girls"].map(function(g){return React.createElement("button",{key:g,onClick:function(){setGender(g);},style:{flex:1,padding:"9px 0",background:gender===g?"linear-gradient(135deg,#1A1000,#2A1800)":"transparent",border:"none",borderRadius:8,color:gender===g?C.goldBright:C.muted,fontSize:12,cursor:"pointer",fontWeight:gender===g?700:400,fontFamily:"'Oswald',sans-serif"}},g.toUpperCase());})
+    ),
+    myEv.map(function(ev){
+      var recs=getRecs(ev.id);var fxc=gender==="boys"?fxcB:fxcG;var isFastest=ev.id.indexOf("xc_3k")===0&&recs[0]&&recs[0].mark_sortable===fxc;
+      return React.createElement("div",{key:ev.id,style:{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:"14px 14px",marginBottom:8}},
+        React.createElement("div",{style:{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:recs.length>0?8:0}},
+          React.createElement("div",{style:{fontSize:13,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}},ev.label),
+          React.createElement("div",{style:{fontSize:9,color:C.muted,padding:"2px 6px",background:C.subtle,borderRadius:4}},ev.type==="field"?"FIELD":"TRACK")
+        ),
+        recs.length===0
+          ?React.createElement("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif",fontStyle:"italic"}},"No record on file")
+          :recs.map(function(rec,ri){
+            return React.createElement("div",{key:rec.id,style:{display:"flex",alignItems:"center",paddingBottom:ri<recs.length-1?6:0,marginBottom:ri<recs.length-1?6:0,borderBottom:ri<recs.length-1?"1px solid "+C.cardBorder+"66":"none"}},
+              React.createElement("div",{style:{flex:1,fontSize:ri===0&&isFastest?14:ri===0?13:12,fontFamily:"'Oswald',sans-serif",fontWeight:ri===0&&isFastest?700:ri===0?600:400,color:ri===0&&isFastest?C.goldBright:ri===0?C.white:C.offWhite}},rec.athlete_names+(rec.year?" ("+rec.year+")":"")),
+              React.createElement("div",{style:{fontSize:ri===0?16:13,fontFamily:"'Oswald',sans-serif",fontWeight:ri===0?700:400,color:ri===0?C.goldBright:C.muted}},rec.mark)
+            );
+          })
+      );
+    })
+  );
+}
+
+function WorkoutBuilder(props){
+  var onBack=props.onBack;var onRefresh=props.onRefresh;var showMsg=props.showMsg;var athletes=props.athletes;
+  var td=DAYS[new Date().getDay()===0?6:new Date().getDay()-1];
+  var _d=useState(td);var day=_d[0];var setDay=_d[1];
+  var _l=useState("");var label=_l[0];var setLabel=_l[1];
+  var _n=useState("");var notes=_n[0];var setNotes=_n[1];
+  var _sv=useState(false);var saving=_sv[0];var setSaving=_sv[1];
+  var _sg=useState([{id:1,paceType:"easy",amount:"",unit:"miles",reps:"1",segNote:""}]);var segs=_sg[0];var setSegs=_sg[1];
+  var sa=athletes.filter(function(a){return a.pr_baseline||a.pr_3k;})[0];
+  var sp=sa?calcPaces(sa.pr_baseline||sa.pr_3k):null;
+  function addSeg(){setSegs(function(p){return p.concat([{id:Date.now(),paceType:"easy",amount:"",unit:"miles",reps:"1",segNote:""}]);});}
+  function remSeg(id){setSegs(function(p){return p.filter(function(s){return s.id!==id;});});}
+  function updSeg(id,f,v){setSegs(function(p){return p.map(function(s){return s.id===id?Object.assign({},s,{[f]:v}):s;});});}
+  function buildDetail(){return segs.map(function(s){var pt=PACE_TYPES.filter(function(p){return p.id===s.paceType;})[0];var rep=parseInt(s.reps)>1?s.reps+"x":"";var unit=s.unit==="miles"?"mi":s.unit==="minutes"?"min":"m";return rep+(s.amount||"?")+" "+unit+" @ "+(pt?pt.label:s.paceType);}).join(" + ");}
+  function save(){
+    if(!day||!label){showMsg("Enter a day and workout name");return;}
+    setSaving(true);
+    var d=new Date();d.setDate(d.getDate()-(d.getDay()===0?6:d.getDay()-1));
+    var hasH=segs.some(function(s){return ["threshold","interval","rep","race"].indexOf(s.paceType)!==-1;});
+    var isR=segs.every(function(s){return s.paceType==="rest";});
+    var segNotes=segs.filter(function(s){return s.segNote;}).map(function(s,i){return "Seg "+(i+1)+": "+s.segNote;}).join(" | ");
+    var fullNotes=[notes,segNotes].filter(Boolean).join(" | ")||null;
+    db.post("workouts",{week_start:d.toISOString().split("T")[0],day:day,label:label.trim(),detail:buildDetail(),type:isR?"rest":hasH?"hard":"easy",notes:fullNotes})
+      .then(function(res){
+        if(res&&res.error){showMsg("Error: "+res.error.message);return;}
+        setLabel("");setNotes("");setSegs([{id:1,paceType:"easy",amount:"",unit:"miles",reps:"1",segNote:""}]);
+        onRefresh();showMsg(day+" workout posted!");
+      })
+      .catch(function(e){showMsg("Error saving workout");})
+      .finally(function(){setSaving(false);});
+  }
+  var inp=function(ex){return Object.assign({width:"100%",padding:"10px 12px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.white,fontFamily:"'Oswald',sans-serif",fontSize:13},ex||{});};
+  return React.createElement("div",{style:{padding:"20px 16px"}},
+    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:20}},
+      React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer"}},React.createElement(Icon,{n:"back",size:22,color:C.muted})),
+      React.createElement(Logo,{size:42,logoUrl:null}),
+      React.createElement("div",null,
+        React.createElement("div",{style:{fontSize:20,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"POST WORKOUT"),
+        React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.15em"}},"BENTON CENTRAL XC")
+      )
+    ),
+    React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:8}},"DAY"),
+    React.createElement("div",{style:{display:"flex",gap:6,marginBottom:16,overflowX:"auto",paddingBottom:4}},
+      DAYS.map(function(d){
+        return React.createElement("button",{key:d,onClick:function(){setDay(d);},style:{flexShrink:0,padding:"8px 12px",background:day===d?"linear-gradient(135deg,#1A1000,#2A1800)":C.card,border:"1px solid "+(day===d?C.goldBright:C.cardBorder),borderRadius:8,color:day===d?C.goldBright:C.muted,fontFamily:"'Oswald',sans-serif",fontSize:11,fontWeight:day===d?700:400,cursor:"pointer",position:"relative"}},
+          d,d===td&&React.createElement("div",{style:{width:4,height:4,borderRadius:"50%",background:C.goldBright,margin:"2px auto 0"}})
+        );
+      })
+    ),
+    React.createElement("input",{placeholder:"Workout name (e.g. Threshold Run)",value:label,onChange:function(e){setLabel(e.target.value);},style:Object.assign({},inp(),{marginBottom:16})}),
+    React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:10}},"SEGMENTS"),
+    segs.map(function(seg,i){
+      var pt=PACE_TYPES.filter(function(p){return p.id===seg.paceType;})[0];
+      var athPaces=athletes.filter(function(a){return a.pr_baseline||a.pr_3k;}).map(function(a){var pr=a.pr_baseline||a.pr_3k;var p=calcPaces(pr);return{name:a.short_name||a.name,pace:p&&seg.paceType!=="rest"?p[seg.paceType]:null};}).filter(function(x){return x.pace;});
+      return React.createElement("div",{key:seg.id,style:{background:C.card,border:"1px solid "+(pt?pt.color:C.cardBorder)+"33",borderRadius:12,padding:"12px 14px",marginBottom:10,position:"relative"}},
+        React.createElement("div",{style:{position:"absolute",left:0,top:0,bottom:0,width:3,background:pt?pt.color:C.cardBorder,borderRadius:"12px 0 0 12px"}}),
+        React.createElement("div",{style:{paddingLeft:8}},
+          React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}},
+            React.createElement("div",{style:{fontSize:10,color:pt?pt.color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",fontWeight:700}},"SEGMENT "+(i+1)),
+            segs.length>1&&React.createElement("button",{onClick:function(){remSeg(seg.id);},style:{background:"none",border:"none",cursor:"pointer"}},React.createElement(Icon,{n:"x",size:14,color:C.muted}))
+          ),
+          React.createElement("select",{value:seg.paceType,onChange:function(e){updSeg(seg.id,"paceType",e.target.value);},style:Object.assign({},inp(),{marginBottom:8})},
+            PACE_TYPES.map(function(p){return React.createElement("option",{key:p.id,value:p.id},p.label+" - "+p.desc);})
+          ),
+          athPaces.length>0&&seg.paceType!=="rest"&&React.createElement("div",{style:{background:(pt?pt.color:C.gold)+"12",border:"1px solid "+(pt?pt.color:C.gold)+"22",borderRadius:8,padding:"8px 10px",marginBottom:8}},
+            React.createElement("div",{style:{fontSize:9,color:pt?pt.color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginBottom:6}},(pt?pt.label.toUpperCase():"PACE")+" PACE BY ATHLETE"),
+            React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:"6px 14px"}},
+              athPaces.map(function(ap){
+                return React.createElement("div",{key:ap.name,style:{display:"flex",alignItems:"center",gap:5}},
+                  React.createElement("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif"}},ap.name),
+                  React.createElement("div",{style:{fontSize:13,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:pt?pt.color:C.goldBright}},ap.pace+"/mi")
+                );
+              })
+            )
+          ),
+          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 70px",gap:8,marginBottom:8}},
+            React.createElement("div",null,
+              React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:4}},"AMOUNT"),
+              React.createElement("input",{placeholder:seg.unit==="miles"?"3.0":seg.unit==="minutes"?"20":"400",value:seg.amount,onChange:function(e){updSeg(seg.id,"amount",e.target.value);},style:inp({padding:"9px 10px"})})
+            ),
+            React.createElement("div",null,
+              React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:4}},"UNIT"),
+              React.createElement("select",{value:seg.unit,onChange:function(e){updSeg(seg.id,"unit",e.target.value);},style:inp({padding:"9px 10px"})},
+                React.createElement("option",{value:"miles"},"Miles"),
+                React.createElement("option",{value:"minutes"},"Minutes"),
+                React.createElement("option",{value:"meters"},"Meters")
+              )
+            ),
+            React.createElement("div",null,
+              React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:4}},"REPS"),
+              React.createElement("input",{type:"number",min:"1",max:"20",value:seg.reps,onChange:function(e){updSeg(seg.id,"reps",e.target.value);},style:inp({padding:"9px 8px"})})
+            )
+          ),
+          React.createElement("input",{placeholder:"Segment note (e.g. Focus on form, stay relaxed)",value:seg.segNote||"",onChange:function(e){updSeg(seg.id,"segNote",e.target.value);},style:inp({padding:"8px 10px",fontSize:12})})
+        )
+      );
+    }),
+    React.createElement("button",{onClick:addSeg,style:{width:"100%",padding:"11px",background:"transparent",border:"1px dashed "+C.cardBorder,borderRadius:10,color:C.muted,fontFamily:"'Oswald',sans-serif",fontSize:12,cursor:"pointer",marginBottom:14,display:"flex",alignItems:"center",justifyContent:"center",gap:6}},
+      React.createElement(Icon,{n:"plus",size:14,color:C.muted}),
+      " ADD SEGMENT"
+    ),
+    segs.some(function(s){return s.amount;})&&React.createElement("div",{style:{background:C.goldBright+"18",border:"1px solid "+C.goldBright+"33",borderRadius:10,padding:12,marginBottom:14}},
+      React.createElement("div",{style:{fontSize:9,color:C.goldBright,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginBottom:6}},"PREVIEW"),
+      React.createElement("div",{style:{fontSize:13,color:C.white,fontFamily:"'Oswald',sans-serif"}},buildDetail())
+    ),
+    React.createElement("textarea",{placeholder:"Overall coach notes (optional)",value:notes,onChange:function(e){setNotes(e.target.value);},style:Object.assign({},inp({height:70,resize:"none"}),{marginBottom:16})}),
+    React.createElement("button",{onClick:save,disabled:saving||!label||!day,style:{width:"100%",padding:"14px",background:label&&day?"linear-gradient(135deg,#1A1000,#2A1800)":C.subtle,border:"1px solid "+(label&&day?C.goldBright:C.cardBorder),borderRadius:10,color:label&&day?C.goldBright:C.muted,fontSize:14,fontWeight:700,cursor:label&&day?"pointer":"default",fontFamily:"'Oswald',sans-serif"}},saving?"POSTING...":"POST WORKOUT")
+  );
+}
+
+function MeetEditor(props){
+  var meets=props.meets;var onBack=props.onBack;var onRefresh=props.onRefresh;var showMsg=props.showMsg;
+  var _v=useState("list");var view=_v[0];var setView=_v[1];
+  var _f=useState({});var form=_f[0];var setForm=_f[1];
+  var _l=useState(false);var loading=_l[0];var setLoading=_l[1];
+  var photoRefs=useRef({});
+  var inp=function(ex){return Object.assign({width:"100%",padding:"10px 12px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.white,fontFamily:"'Oswald',sans-serif",fontSize:13},ex||{});};
+  function save(){
+    if(!form.name||!form.date)return;setLoading(true);
+    var body={name:form.name,date:form.date,location:form.location||null,start_time:form.start_time||null,bus_time:form.bus_time||null,course_type:form.course_type||"neutral",course_note:form.course_note||null,status:form.status||"upcoming",boys_place:form.boys_place?parseInt(form.boys_place):null,boys_points:form.boys_points?parseInt(form.boys_points):null,girls_place:form.girls_place?parseInt(form.girls_place):null,girls_points:form.girls_points?parseInt(form.girls_points):null,section:form.section||null,city:form.city||null};
+    var p=form.id?db.patch("meets",form.id,body):db.post("meets",body);
+    p.then(function(){setLoading(false);setForm({});setView("list");onRefresh();showMsg(form.id?"Meet updated!":"Meet added!");});
+  }
+  function uploadPhotos(meetId,files){
+    var promises=Array.from(files).map(function(f){var ext=f.name.split(".").pop();var path="meet-"+meetId+"-"+Date.now()+"-"+Math.random().toString(36).substr(2,5)+"."+ext;return db.uploadFile("app-assets",path,f);});
+    Promise.all(promises).then(function(urls){
+      var valid=urls.filter(Boolean);
+      var mt=meets.filter(function(m){return m.id===meetId;})[0];
+      var existing=mt&&mt.photos?mt.photos.split(",").filter(Boolean):[];
+      return db.patch("meets",meetId,{photos:existing.concat(valid).join(",")});
+    }).then(function(){onRefresh();showMsg("Photos uploaded!");});
+  }
+  if(view==="edit"||view==="add")return React.createElement("div",{style:{padding:"20px 16px"}},
+    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:20}},React.createElement("button",{onClick:function(){setView("list");},style:{background:"none",border:"none",cursor:"pointer"}},React.createElement(Icon,{n:"back",size:22,color:C.muted})),React.createElement("div",{style:{fontSize:20,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},view==="edit"?"EDIT MEET":"ADD MEET")),
+    React.createElement("input",{placeholder:"Meet name",value:form.name||"",onChange:function(e){setForm(Object.assign({},form,{name:e.target.value}));},style:Object.assign({},inp(),{marginBottom:8})}),
+    React.createElement("input",{placeholder:"Date (e.g. Sep 5, 2026)",value:form.date||"",onChange:function(e){setForm(Object.assign({},form,{date:e.target.value}));},style:Object.assign({},inp(),{marginBottom:8})}),
+    React.createElement("input",{placeholder:"Location (venue name)",value:form.location||"",onChange:function(e){setForm(Object.assign({},form,{location:e.target.value}));},style:Object.assign({},inp(),{marginBottom:8})}),
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}},
+      React.createElement("input",{placeholder:"Start time",value:form.start_time||"",onChange:function(e){setForm(Object.assign({},form,{start_time:e.target.value}));},style:inp()}),
+      React.createElement("input",{placeholder:"Bus departure",value:form.bus_time||"",onChange:function(e){setForm(Object.assign({},form,{bus_time:e.target.value}));},style:inp()})
+    ),
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}},
+      React.createElement("input",{placeholder:"Section (e.g. Varsity, JV)",value:form.section||"",onChange:function(e){setForm(Object.assign({},form,{section:e.target.value}));},style:inp()}),
+      React.createElement("input",{placeholder:"City (for weather)",value:form.city||"",onChange:function(e){setForm(Object.assign({},form,{city:e.target.value}));},style:inp()})
+    ),
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}},
+      React.createElement("select",{value:form.course_type||"neutral",onChange:function(e){setForm(Object.assign({},form,{course_type:e.target.value}));},style:inp()},React.createElement("option",{value:"fast"},"Fast Course"),React.createElement("option",{value:"neutral"},"Neutral Course"),React.createElement("option",{value:"slow"},"Slow Course")),
+      React.createElement("select",{value:form.status||"upcoming",onChange:function(e){setForm(Object.assign({},form,{status:e.target.value}));},style:inp()},React.createElement("option",{value:"upcoming"},"Upcoming"),React.createElement("option",{value:"next"},"Next Meet"),React.createElement("option",{value:"done"},"Completed"))
+    ),
+    React.createElement("input",{placeholder:"Course note",value:form.course_note||"",onChange:function(e){setForm(Object.assign({},form,{course_note:e.target.value}));},style:Object.assign({},inp(),{marginBottom:14})}),
+    React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:8}},"TEAM RESULTS"),
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}},
+      React.createElement("input",{placeholder:"Boys place",value:form.boys_place||"",onChange:function(e){setForm(Object.assign({},form,{boys_place:e.target.value}));},style:inp(),type:"number"}),
+      React.createElement("input",{placeholder:"Boys points",value:form.boys_points||"",onChange:function(e){setForm(Object.assign({},form,{boys_points:e.target.value}));},style:inp(),type:"number"})
+    ),
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:20}},
+      React.createElement("input",{placeholder:"Girls place",value:form.girls_place||"",onChange:function(e){setForm(Object.assign({},form,{girls_place:e.target.value}));},style:inp(),type:"number"}),
+      React.createElement("input",{placeholder:"Girls points",value:form.girls_points||"",onChange:function(e){setForm(Object.assign({},form,{girls_points:e.target.value}));},style:inp(),type:"number"})
+    ),
+    React.createElement("button",{onClick:save,disabled:loading||!form.name||!form.date,style:{width:"100%",padding:"14px",background:form.name&&form.date?"linear-gradient(135deg,#1A1000,#2A1800)":C.subtle,border:"1px solid "+(form.name&&form.date?C.goldBright:C.cardBorder),borderRadius:10,color:form.name&&form.date?C.goldBright:C.muted,fontSize:14,fontWeight:700,cursor:form.name&&form.date?"pointer":"default",fontFamily:"'Oswald',sans-serif"}},loading?"SAVING...":"SAVE MEET")
+  );
+  return React.createElement("div",{style:{padding:"20px 16px"}},
+    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:16}},
+      React.createElement("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer"}},React.createElement(Icon,{n:"back",size:22,color:C.muted})),
+      React.createElement("div",{style:{flex:1}},React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em"}},"COACH PORTAL"),React.createElement("div",{style:{fontSize:22,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"MEET SCHEDULE")),
+      React.createElement("button",{onClick:function(){setForm({status:"upcoming"});setView("add");},style:{display:"flex",alignItems:"center",gap:6,padding:"8px 14px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:10,color:C.goldBright,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Oswald',sans-serif"}},React.createElement(Icon,{n:"plus",size:14,color:C.goldBright})," ADD")
+    ),
+    meets.map(function(m){
+      return React.createElement("div",{key:m.id,style:{display:"flex",alignItems:"center",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:"12px 14px",marginBottom:8}},
+        React.createElement("div",{style:{flex:1}},
+          React.createElement("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}},m.name+(m.section?" - "+m.section:"")),
+          React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:2}},m.date+(m.location?" - "+m.location:"")),
+          m.bus_time&&React.createElement("div",{style:{fontSize:10,color:C.gold,fontFamily:"'Oswald',sans-serif"}},"Bus: "+m.bus_time)
+        ),
+        React.createElement("div",{style:{padding:"3px 8px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:6,fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",marginRight:8}},m.status?m.status.toUpperCase():""),
+        React.createElement("button",{onClick:function(){setForm(Object.assign({},m));setView("edit");},style:{width:34,height:34,borderRadius:8,background:C.subtle,border:"1px solid "+C.cardBorder,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}},React.createElement(Icon,{n:"edit",size:15,color:C.muted})),
+        React.createElement("div",{style:{marginLeft:4}},
+          React.createElement("input",{type:"file",accept:"image/*",multiple:true,style:{display:"none"},ref:function(el){photoRefs.current[m.id]=el;},onChange:function(e){uploadPhotos(m.id,e.target.files);}}),
+          React.createElement("button",{onClick:function(){if(photoRefs.current[m.id])photoRefs.current[m.id].click();},title:"Upload photos",style:{width:34,height:34,borderRadius:8,background:C.subtle,border:"1px solid "+C.cardBorder,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}},React.createElement(Icon,{n:"plus",size:13,color:C.muted}))
+        )
+      );
+    })
+  );
+}
+
+
+function ResultEditor(props){
+  var athletes=props.athletes,meets=props.meets,results=props.results,onBack=props.onBack,onRefresh=props.onRefresh,showMsg=props.showMsg;
+  var _m=useState("");var meetId=_m[0];var setMeetId=_m[1];
+  var _e=useState(null);var editId=_e[0];var setEditId=_e[1];
+  var _f=useState({});var form=_f[0];var setForm=_f[1];
+  var _l=useState(false);var loading=_l[0];var setLoading=_l[1];
+  var _a=useState({});var addF=_a[0];var setAddF=_a[1];
+  var _ad=useState(false);var adding=_ad[0];var setAdding=_ad[1];
+  var R=React.createElement;
+  var inp=function(ex){return Object.assign({width:"100%",padding:"10px 12px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.white,fontFamily:"'Oswald',sans-serif",fontSize:13},ex||{});};
+  var mr=results.filter(function(r){return r.meet_id===meetId&&r.time&&r.time.indexOf("_split")===-1;}).map(function(r){return Object.assign({},r,{athlete:athletes.find(function(a){return a.id===r.athlete_id;})});}).sort(function(a,b){return (a.place||99)-(b.place||99);});
+  var saveEdit=async function(){if(!editId)return;setLoading(true);await db.patch("results",editId,{time:form.time,place:form.place?parseInt(form.place):null,goal_time:form.goal_time||null});if(form.time){var ath=athletes.find(function(a){return a.id===form.athlete_id;});if(ath&&(!ath.pr_3k||t2s(form.time)<t2s(ath.pr_3k)))await db.patch("athletes",ath.id,{pr_3k:form.time});}setLoading(false);setEditId(null);setForm({});onRefresh();showMsg("Updated!");};
+  var saveAdd=async function(){if(!addF.athlete_id||!addF.time||!meetId)return;setAdding(true);await db.post("results",{athlete_id:addF.athlete_id,meet_id:meetId,time:addF.time,place:addF.place?parseInt(addF.place):null,goal_time:addF.goal_time||null});var ath=athletes.find(function(a){return a.id===addF.athlete_id;});if(ath&&(!ath.pr_3k||t2s(addF.time)<t2s(ath.pr_3k)))await db.patch("athletes",ath.id,{pr_3k:addF.time});setAdding(false);setAddF({});onRefresh();showMsg("Added!");};
+  return R("div",{style:{padding:"20px 16px"}},
+    R("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:20}},
+      R("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer"}},R(Icon,{n:"back",size:22,color:C.muted})),
+      R("div",{style:{fontSize:20,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"EDIT RESULTS")
+    ),
+    R("select",{value:meetId,onChange:function(e){setMeetId(e.target.value);},style:Object.assign(inp(),{marginBottom:16})},
+      R("option",{value:""},"Select meet..."),
+      meets.map(function(m){return R("option",{key:m.id,value:m.id},m.name);})
+    ),
+    meetId&&R("div",null,
+      R("div",{style:{background:"linear-gradient(135deg,#1A1000,"+C.card+")",border:"1px solid "+C.gold+"44",borderRadius:12,padding:14,marginBottom:14}},
+        R("div",{style:{fontSize:9,color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:10}},"ADD MISSED ATHLETE"),
+        R("select",{value:addF.athlete_id||"",onChange:function(e){setAddF(Object.assign({},addF,{athlete_id:e.target.value}));},style:Object.assign(inp(),{marginBottom:8})},
+          R("option",{value:""},"Select athlete..."),
+          athletes.map(function(a){return R("option",{key:a.id,value:a.id},a.name+" (GR "+a.grade+")");})
+        ),
+        R("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:8}},
+          R("input",{placeholder:"Time (11:34)",value:addF.time||"",onChange:function(e){setAddF(Object.assign({},addF,{time:e.target.value}));},style:inp()}),
+          R("input",{placeholder:"Place",type:"number",value:addF.place||"",onChange:function(e){setAddF(Object.assign({},addF,{place:e.target.value}));},style:inp()}),
+          R("input",{placeholder:"Goal time",value:addF.goal_time||"",onChange:function(e){setAddF(Object.assign({},addF,{goal_time:e.target.value}));},style:inp()})
+        ),
+        R("button",{onClick:saveAdd,disabled:adding||!addF.athlete_id||!addF.time,style:{width:"100%",padding:"10px",background:addF.athlete_id&&addF.time?"linear-gradient(135deg,#1A1000,#2A1800)":C.subtle,border:"1px solid "+(addF.athlete_id&&addF.time?C.goldBright:C.cardBorder),borderRadius:8,color:addF.athlete_id&&addF.time?C.goldBright:C.muted,fontSize:13,fontWeight:700,cursor:addF.athlete_id&&addF.time?"pointer":"default"}},adding?"ADDING...":"ADD RESULT")
+      ),
+      R("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:10}},"RECORDED RESULTS"),
+      mr.length===0?R("div",{style:{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:20,textAlign:"center"}},R("div",{style:{fontSize:13,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"No results for this meet"))
+      :mr.map(function(r){
+        return R("div",{key:r.id,style:{background:C.card,border:"1px solid "+(editId===r.id?C.goldBright:C.cardBorder),borderRadius:12,padding:"12px 14px",marginBottom:8}},
+          editId===r.id?R("div",null,
+            R("div",{style:{fontSize:12,color:C.goldBright,fontFamily:"'Oswald',sans-serif",marginBottom:8}},r.athlete?r.athlete.name:"Athlete"),
+            R("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:8}},
+              R("input",{placeholder:"Time",value:form.time||"",onChange:function(e){setForm(Object.assign({},form,{time:e.target.value}));},style:inp({padding:"8px 10px"})}),
+              R("input",{placeholder:"Place",type:"number",value:form.place||"",onChange:function(e){setForm(Object.assign({},form,{place:e.target.value}));},style:inp({padding:"8px 10px"})}),
+              R("input",{placeholder:"Goal",value:form.goal_time||"",onChange:function(e){setForm(Object.assign({},form,{goal_time:e.target.value}));},style:inp({padding:"8px 10px"})})
+            ),
+            R("div",{style:{display:"flex",gap:8}},
+              R("button",{onClick:saveEdit,disabled:loading,style:{flex:1,padding:"9px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:8,color:C.goldBright,fontSize:13,fontWeight:700,cursor:"pointer"}},loading?"...":"SAVE"),
+              R("button",{onClick:function(){setEditId(null);setForm({});},style:{padding:"9px 16px",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.muted,fontSize:13,cursor:"pointer"}},"CANCEL")
+            )
+          ):R("div",{style:{display:"flex",alignItems:"center"}},
+            R(Avatar,{athlete:r.athlete,size:32}),
+            R("div",{style:{flex:1,marginLeft:10}},
+              R("div",{style:{fontSize:13,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}},r.athlete?r.athlete.name:"Unknown"),
+              R("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif"}},(r.place?"#"+r.place+" - ":"")+r.time+(r.goal_time?" | Goal: "+r.goal_time:""))
+            ),
+            R("button",{onClick:function(){setEditId(r.id);setForm({time:r.time,place:r.place||"",goal_time:r.goal_time||"",athlete_id:r.athlete_id});},style:{width:32,height:32,borderRadius:8,background:C.subtle,border:"1px solid "+C.cardBorder,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}},R(Icon,{n:"edit",size:14,color:C.muted}))
+          )
+        );
+      })
+    )
+  );
+}
+
+function RecordsEditor(props){
+  var records=props.records,onBack=props.onBack,onRefresh=props.onRefresh,showMsg=props.showMsg;
+  var _g=useState("boys");var gender=_g[0];var setGender=_g[1];
+  var _e=useState(null);var editEvId=_e[0];var setEditEvId=_e[1];
+  var _f=useState({});var form=_f[0];var setForm=_f[1];
+  var _l=useState(false);var loading=_l[0];var setLoading=_l[1];
+  var R=React.createElement;
+  var inp=function(ex){return Object.assign({width:"100%",padding:"10px 12px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.white,fontFamily:"'Oswald',sans-serif",fontSize:13},ex||{});};
+  var myEv=RECORD_EVENTS.filter(function(e){return e.gender===gender;});
+  var evRecs=function(id){return records.filter(function(r){return r.event_id===id;}).sort(function(a,b){return a.mark_sortable-b.mark_sortable;});};
+  var saveRec=async function(){
+    if(!form.athlete_names||!form.mark)return;setLoading(true);
+    var ev=RECORD_EVENTS.find(function(e){return e.id===editEvId;});
+    var sort=0;
+    if(ev&&ev.type==="time"){sort=t2s(form.mark);}
+    else{var p=form.mark.split("'");sort=p.length>1?parseFloat(p[0])*12+parseFloat(p[1]):parseFloat(form.mark);}
+    var body={event_id:editEvId,athlete_names:form.athlete_names,year:form.year||null,mark:form.mark,mark_sortable:sort};
+    if(form.id){await db.patch("records",form.id,body);}else{await db.post("records",body);}
+    setLoading(false);setForm({});setEditEvId(null);onRefresh();showMsg("Record saved!");
+  };
+  return R("div",{style:{padding:"20px 16px"}},
+    R("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:16}},
+      R("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer"}},R(Icon,{n:"back",size:22,color:C.muted})),
+      R("div",{style:{flex:1}},
+        R("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em"}},"COACH PORTAL"),
+        R("div",{style:{fontSize:22,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"MANAGE RECORDS")
+      )
+    ),
+    R("div",{style:{display:"flex",background:C.card,borderRadius:10,padding:3,border:"1px solid "+C.cardBorder,marginBottom:14}},
+      ["boys","girls"].map(function(g){return R("button",{key:g,onClick:function(){setGender(g);},style:{flex:1,padding:"9px 0",background:gender===g?"linear-gradient(135deg,#1A1000,#2A1800)":"transparent",border:"none",borderRadius:8,color:gender===g?C.goldBright:C.muted,fontSize:12,cursor:"pointer",fontWeight:gender===g?700:400}},g.toUpperCase());})
+    ),
+    myEv.map(function(ev){
+      var recs=evRecs(ev.id);var isE=editEvId===ev.id;
+      return R("div",{key:ev.id,style:{background:C.card,border:"1px solid "+(isE?C.goldBright:C.cardBorder),borderRadius:12,padding:"14px 14px",marginBottom:8}},
+        R("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}},
+          R("div",{style:{fontSize:13,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}},ev.label),
+          R("div",{style:{display:"flex",gap:6}},
+            R("div",{style:{fontSize:9,color:C.muted,padding:"2px 6px",background:C.subtle,borderRadius:4}},ev.type==="field"?"FIELD":"TRACK"),
+            R("button",{onClick:function(){if(isE){setEditEvId(null);setForm({});}else{setEditEvId(ev.id);setForm({athlete_names:ev.relay?"Athlete 1, Athlete 2, Athlete 3, Athlete 4":"",mark:"",year:new Date().getFullYear()});}},style:{padding:"3px 10px",background:isE?"transparent":"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+(isE?C.muted:C.goldBright),borderRadius:6,color:isE?C.muted:C.goldBright,fontSize:10,fontFamily:"'Oswald',sans-serif",cursor:"pointer"}},isE?"CANCEL":"+ ADD")
+          )
+        ),
+        recs.map(function(rec,ri){return R("div",{key:rec.id,style:{display:"flex",alignItems:"center",paddingBottom:ri<recs.length-1?6:0,marginBottom:ri<recs.length-1?6:0,borderBottom:ri<recs.length-1?"1px solid "+C.cardBorder+"55":"none"}},
+          R("div",{style:{flex:1,fontSize:ri===0?13:11,fontFamily:"'Oswald',sans-serif",color:ri===0?C.white:C.offWhite}},rec.athlete_names+(rec.year?" ("+rec.year+")":"")),
+          R("div",{style:{fontSize:ri===0?16:13,fontFamily:"'Oswald',sans-serif",fontWeight:ri===0?700:400,color:ri===0?C.goldBright:C.muted,marginRight:8}},rec.mark),
+          R("button",{onClick:async function(){await db.del("records",rec.id);onRefresh();showMsg("Removed.");},style:{background:"none",border:"none",cursor:"pointer",padding:4}},R(Icon,{n:"x",size:12,color:C.muted}))
+        );}),
+        recs.length===0&&!isE&&R("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif",fontStyle:"italic"}},"No record on file"),
+        isE&&R("div",{style:{borderTop:"1px solid "+C.cardBorder,paddingTop:12,marginTop:8}},
+          R("div",{style:{fontSize:9,color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginBottom:8}},"ADD ENTRY"),
+          R("input",{placeholder:ev.relay?"Athlete 1, Athlete 2, Athlete 3, Athlete 4":"Athlete name",value:form.athlete_names||"",onChange:function(e){setForm(Object.assign({},form,{athlete_names:e.target.value}));},style:Object.assign(inp(),{marginBottom:6})}),
+          R("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:6}},
+            R("input",{placeholder:ev.type==="time"?"Time (e.g. 1:23)":"Mark (e.g. 42ft 6in)",value:form.mark||"",onChange:function(e){setForm(Object.assign({},form,{mark:e.target.value}));},style:inp()}),
+            R("input",{placeholder:"Year",type:"number",value:form.year||"",onChange:function(e){setForm(Object.assign({},form,{year:e.target.value}));},style:inp()})
+          ),
+          R("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:8}},ev.type==="time"?"Format: M:SS.cc or MM:SS":"Format: Feet/Inches (e.g. 42ft 6in)"),
+          R("button",{onClick:saveRec,disabled:loading||!form.athlete_names||!form.mark,style:{width:"100%",padding:"10px",background:form.athlete_names&&form.mark?"linear-gradient(135deg,#1A1000,#2A1800)":C.subtle,border:"1px solid "+(form.athlete_names&&form.mark?C.goldBright:C.cardBorder),borderRadius:8,color:form.athlete_names&&form.mark?C.goldBright:C.muted,fontSize:13,fontWeight:700,cursor:form.athlete_names&&form.mark?"pointer":"default"}},loading?"SAVING...":"SAVE RECORD")
+        )
+      );
+    })
+  );
+}
+
+function RosterManager(props){
+  var athletes=props.athletes,onBack=props.onBack,onRefresh=props.onRefresh,showMsg=props.showMsg;
+  var _sv=useState("list");var sv=_sv[0];var setSv=_sv[1];
+  var _fo=useState({});var form=_fo[0];var setForm=_fo[1];
+  var _lo=useState(false);var loading=_lo[0];var setLoading=_lo[1];
+  var _gf=useState("all");var gf=_gf[0];var setGf=_gf[1];
+  var _ca=useState(null);var confirmA=_ca[0];var setConfirmA=_ca[1];
+  var _pp=useState(null);var photoPreview=_pp[0];var setPhotoPreview=_pp[1];
+  var _up=useState(false);var uploading=_up[0];var setUploading=_up[1];
+  var fileRef=useRef(null);
+  var R=React.createElement;
+  var inp=function(ex){return Object.assign({width:"100%",padding:"11px 12px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.white,fontFamily:"'Oswald',sans-serif",fontSize:13},ex||{});};
+  var filtered=[].concat(athletes.filter(function(a){return gf==="all"||a.gender===gf;})).sort(function(a,b){return t2s(a.pr_3k||"99:99")-t2s(b.pr_3k||"99:99");});
+  var openEdit=function(a){setForm({id:a.id,name:a.name,short_name:a.short_name||"",grade:a.grade,gender:a.gender,pr_3k:a.pr_3k||"",pr_5k:a.pr_5k||"",pr_1600:a.pr_1600||"",pr_800:a.pr_800||"",pr_baseline:a.pr_baseline||"",attendance:a.attendance||100,weekly_mileage:a.weekly_mileage||0,parent_phone:a.parent_phone||"",badge:a.badge||"",photo_url:a.photo_url||""});setPhotoPreview(a.photo_url||null);setSv("edit");};
+  var openAdd=function(){setForm({grade:9,gender:"boys",attendance:100,weekly_mileage:0});setPhotoPreview(null);setSv("add");};
+  var autoShort=function(n){if(!n)return"";var p=n.trim().split(" ");return p[0]+" "+p[p.length-1][0]+".";};
+  var handlePhoto=async function(e){var f=e.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(ev){setPhotoPreview(ev.target.result);};rd.readAsDataURL(f);if(sv==="edit"&&form.id){setUploading(true);var url=await db.uploadPhoto(form.id,f);if(url){await db.patch("athletes",form.id,{photo_url:url});setForm(function(x){return Object.assign({},x,{photo_url:url});});showMsg("Photo uploaded!");}setUploading(false);}else{setForm(function(x){return Object.assign({},x,{_photoFile:f});});}};
+  var saveEdit=async function(){if(!form.id)return;setLoading(true);await db.patch("athletes",form.id,{name:form.name.trim(),short_name:form.short_name||autoShort(form.name),grade:parseInt(form.grade),gender:form.gender,pr_3k:form.pr_3k||null,pr_5k:form.pr_5k||null,pr_1600:form.pr_1600||null,pr_800:form.pr_800||null,pr_baseline:form.pr_baseline||null,attendance:parseInt(form.attendance)||100,weekly_mileage:parseInt(form.weekly_mileage)||0,parent_phone:form.parent_phone||null,badge:form.badge||null});setLoading(false);setForm({});setSv("list");onRefresh();showMsg("Updated!");};
+  var saveAdd=async function(){if(!form.name)return;setLoading(true);var res=await db.post("athletes",{name:form.name.trim(),short_name:form.short_name||autoShort(form.name),grade:parseInt(form.grade)||9,gender:form.gender||"boys",pr_3k:form.pr_3k||null,pr_5k:form.pr_5k||null,pr_1600:form.pr_1600||null,pr_800:form.pr_800||null,pr_baseline:form.pr_baseline||null,attendance:parseInt(form.attendance)||100,weekly_mileage:parseInt(form.weekly_mileage)||0,parent_phone:form.parent_phone||null,badge:form.badge||null,active:true});var nid=Array.isArray(res)?(res[0]&&res[0].id):res&&res.id;if(nid&&form._photoFile){var url=await db.uploadPhoto(nid,form._photoFile);if(url)await db.patch("athletes",nid,{photo_url:url});}setLoading(false);setForm({});setSv("list");onRefresh();showMsg(form.name+" added!");};
+  var doRem=async function(){setLoading(true);await db.patch("athletes",confirmA.id,{active:false});setLoading(false);setConfirmA(null);setSv("list");onRefresh();showMsg(confirmA.name+" removed.");};
+
+  if(sv==="confirm_remove") return R("div",{style:{padding:"20px 16px"}},
+    R("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:24}},R("button",{onClick:function(){setSv("list");},style:{background:"none",border:"none",cursor:"pointer"}},R(Icon,{n:"back",size:22,color:C.muted})),R("div",{style:{fontSize:20,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"REMOVE ATHLETE")),
+    R("div",{style:{background:C.red+"18",border:"1px solid "+C.red+"44",borderRadius:14,padding:20,marginBottom:20,textAlign:"center"}},
+      R("div",{style:{width:52,height:52,borderRadius:14,background:"#1A1A1A",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright,margin:"0 auto 12px"}},initials(confirmA?confirmA.name:"")),
+      R("div",{style:{fontSize:18,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,marginBottom:6}},confirmA?confirmA.name:""),
+      R("div",{style:{fontSize:13,color:C.offWhite,fontFamily:"'Oswald',sans-serif",lineHeight:1.6}},"Removes from roster. Results and history are preserved.")
+    ),
+    R("button",{onClick:doRem,disabled:loading,style:{width:"100%",padding:"13px",background:"#8B1A1A",border:"none",borderRadius:10,color:C.white,fontSize:14,fontWeight:700,cursor:"pointer",marginBottom:10}},loading?"REMOVING...":"YES, REMOVE"),
+    R("button",{onClick:function(){setSv("list");},style:{width:"100%",padding:"13px",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:10,color:C.muted,fontSize:14,cursor:"pointer"}},"CANCEL")
+  );
+
+  if(sv==="add"||sv==="edit"){
+    var isE=sv==="edit";
+    var paces=form.pr_baseline?calcPaces(form.pr_baseline):null;
+    return R("div",{style:{padding:"20px 16px"}},
+      R("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:20}},R("button",{onClick:function(){setSv("list");setPhotoPreview(null);},style:{background:"none",border:"none",cursor:"pointer"}},R(Icon,{n:"back",size:22,color:C.muted})),R("div",{style:{fontSize:20,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},isE?"EDIT":"ADD ATHLETE")),
+      R("div",{style:{display:"flex",alignItems:"center",gap:16,marginBottom:20}},
+        R("div",{style:{position:"relative"}},
+          photoPreview?R("div",{style:{width:72,height:72,borderRadius:14,overflow:"hidden",border:"2px solid "+C.goldBright+"55"}},R("img",{src:photoPreview,alt:"",style:{width:"100%",height:"100%",objectFit:"cover",objectPosition:"top center"}})):R("div",{style:{width:72,height:72,borderRadius:14,background:"#1A1A1A",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright,border:"1px solid "+C.cardBorder}},form.name?initials(form.name):"?"),
+          R("div",{style:{position:"absolute",bottom:-6,right:-6,width:24,height:24,borderRadius:"50%",background:C.goldDim,border:"2px solid "+C.black,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"},onClick:function(){if(fileRef.current)fileRef.current.click();}},R(Icon,{n:"edit",size:11}))
+        ),
+        R("div",null,
+          R("input",{ref:fileRef,type:"file",accept:"image/*",style:{display:"none"},onChange:handlePhoto}),
+          R("button",{onClick:function(){if(fileRef.current)fileRef.current.click();},style:{padding:"8px 16px",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:8,color:uploading?C.muted:C.white,fontSize:12,fontFamily:"'Oswald',sans-serif",cursor:"pointer",marginBottom:4,display:"block"}},uploading?"UPLOADING...":photoPreview?"CHANGE PHOTO":"UPLOAD PHOTO"),
+          R("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"Coach portal only")
+        )
+      ),
+      R("input",{placeholder:"Full name",value:form.name||"",onChange:function(e){setForm(Object.assign({},form,{name:e.target.value}));},style:Object.assign(inp(),{marginBottom:6})}),
+      R("input",{placeholder:"Short name (auto if blank)",value:form.short_name||"",onChange:function(e){setForm(Object.assign({},form,{short_name:e.target.value}));},style:Object.assign(inp(),{marginBottom:14})}),
+      R("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}},
+        R("select",{value:form.grade||9,onChange:function(e){setForm(Object.assign({},form,{grade:e.target.value}));},style:inp()},[6,7,8,9,10,11,12].map(function(g){return R("option",{key:g,value:g},"Grade "+g);})),
+        R("select",{value:form.gender||"boys",onChange:function(e){setForm(Object.assign({},form,{gender:e.target.value}));},style:inp()},R("option",{value:"boys"},"Boys"),R("option",{value:"girls"},"Girls"))
+      ),
+      R("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:6}},
+        R("input",{placeholder:"3K PR",value:form.pr_3k||"",onChange:function(e){setForm(Object.assign({},form,{pr_3k:e.target.value}));},style:inp()}),
+        R("input",{placeholder:"5K PR",value:form.pr_5k||"",onChange:function(e){setForm(Object.assign({},form,{pr_5k:e.target.value}));},style:inp()})
+      ),
+      R("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}},
+        R("input",{placeholder:"1600m",value:form.pr_1600||"",onChange:function(e){setForm(Object.assign({},form,{pr_1600:e.target.value}));},style:inp()}),
+        R("input",{placeholder:"800m",value:form.pr_800||"",onChange:function(e){setForm(Object.assign({},form,{pr_800:e.target.value}));},style:inp()})
+      ),
+      R("div",{style:{background:C.goldBright+"12",border:"1px solid "+C.goldBright+"22",borderRadius:8,padding:"10px 12px",marginBottom:14}},
+        R("div",{style:{fontSize:9,color:C.goldBright,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginBottom:6}},"DANIELS BASELINE (VDOT)"),
+        R("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:8,lineHeight:1.5}},"Enter the 1-mile baseline time from beginning-of-season trial. Used for Daniels VDOT paces."),
+        R("input",{placeholder:"1-mile baseline (e.g. 6:34)",value:form.pr_baseline||"",onChange:function(e){setForm(Object.assign({},form,{pr_baseline:e.target.value}));},style:inp({marginBottom:0})}),
+        paces&&R("div",{style:{marginTop:8,display:"flex",gap:12,flexWrap:"wrap"}},
+          [{l:"EASY",k:"easy"},{l:"THRESH",k:"threshold"},{l:"INTERVAL",k:"interval"},{l:"RACE",k:"race"}].map(function(p){return R("div",{key:p.k,style:{textAlign:"center"}},R("div",{style:{fontSize:13,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright}},paces[p.k]),R("div",{style:{fontSize:8,color:C.muted,fontFamily:"'Oswald',sans-serif"}},p.l));})
+        )
+      ),
+      R("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}},
+        R("input",{placeholder:"Attendance %",type:"number",value:form.attendance||"",onChange:function(e){setForm(Object.assign({},form,{attendance:e.target.value}));},style:inp()}),
+        R("input",{placeholder:"Weekly miles",type:"number",value:form.weekly_mileage||"",onChange:function(e){setForm(Object.assign({},form,{weekly_mileage:e.target.value}));},style:inp()})
+      ),
+      R("input",{placeholder:"Parent phone (comma-separate multiple)",value:form.parent_phone||"",onChange:function(e){setForm(Object.assign({},form,{parent_phone:e.target.value}));},style:Object.assign(inp(),{marginBottom:14})}),
+      R("select",{value:form.badge||"",onChange:function(e){setForm(Object.assign({},form,{badge:e.target.value}));},style:Object.assign(inp(),{marginBottom:20})},BADGES.map(function(b){return R("option",{key:b,value:b},b||"No badge");})),
+      R("button",{onClick:isE?saveEdit:saveAdd,disabled:loading||!form.name,style:{width:"100%",padding:"14px",background:form.name?"linear-gradient(135deg,#1A1000,#2A1800)":C.subtle,border:"1px solid "+(form.name?C.goldBright:C.cardBorder),borderRadius:10,color:form.name?C.goldBright:C.muted,fontSize:14,fontWeight:700,cursor:form.name?"pointer":"default",marginBottom:isE?10:0}},loading?"SAVING...":isE?"SAVE CHANGES":"ADD TO THE HERD"),
+      isE&&R("button",{onClick:function(){setConfirmA(athletes.find(function(a){return a.id===form.id;}));setSv("confirm_remove");},style:{width:"100%",padding:"13px",background:"transparent",border:"1px solid "+C.red+"44",borderRadius:10,color:C.red,fontSize:13,cursor:"pointer",marginTop:4}},"REMOVE FROM ROSTER")
+    );
+  }
+
+  return R("div",{style:{padding:"20px 16px"}},
+    R("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:16}},
+      R("button",{onClick:onBack,style:{background:"none",border:"none",cursor:"pointer"}},R(Icon,{n:"back",size:22,color:C.muted})),
+      R("div",{style:{flex:1}},R("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em"}},"COACH PORTAL"),R("div",{style:{fontSize:22,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"ROSTER")),
+      R("button",{onClick:openAdd,style:{display:"flex",alignItems:"center",gap:6,padding:"8px 14px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:10,color:C.goldBright,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Oswald',sans-serif"}},R(Icon,{n:"plus",size:14,color:C.goldBright})," ADD")
+    ),
+    R("div",{style:{display:"flex",gap:8,marginBottom:14}},
+      [{l:"TOTAL",v:athletes.length},{l:"BOYS",v:athletes.filter(function(a){return a.gender==="boys";}).length},{l:"GIRLS",v:athletes.filter(function(a){return a.gender==="girls";}).length}].map(function(s){return R("div",{key:s.l,style:{flex:1,background:C.card,border:"1px solid "+C.cardBorder,borderRadius:10,padding:"10px 12px",textAlign:"center"}},R("div",{style:{fontSize:22,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright}},s.v),R("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em"}},s.l));})
+    ),
+    R("div",{style:{display:"flex",background:C.card,borderRadius:10,padding:3,border:"1px solid "+C.cardBorder,marginBottom:14}},
+      ["all","boys","girls"].map(function(g){return R("button",{key:g,onClick:function(){setGf(g);},style:{flex:1,padding:"8px 0",background:gf===g?"linear-gradient(135deg,#1A1000,#2A1800)":"transparent",border:"none",borderRadius:8,color:gf===g?C.goldBright:C.muted,fontSize:11,cursor:"pointer",fontWeight:gf===g?700:400}},g.toUpperCase());})
+    ),
+    filtered.map(function(a,i){return R("div",{key:a.id,style:{display:"flex",alignItems:"center",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:"12px 14px",marginBottom:8}},
+      R("div",{style:{width:24,fontSize:12,color:C.muted,fontFamily:"'Oswald',sans-serif",fontWeight:700}},i+1),
+      R(Avatar,{athlete:a,size:40}),
+      R("div",{style:{flex:1,minWidth:0,marginLeft:12}},
+        R("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},a.name),
+        R("div",{style:{display:"flex",gap:6,marginTop:2}},
+          R("span",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"GR "+a.grade),
+          R("span",{style:{fontSize:10,color:a.pr_3k?C.white:C.muted,fontFamily:"'Oswald',sans-serif"}},a.pr_3k||"No PR"),
+          a.parent_phone&&R("span",{style:{fontSize:10,color:C.goldDim,fontFamily:"'Oswald',sans-serif"}},"[ph]")
+        ),
+        a.badge&&R("div",{style:{marginTop:4,display:"inline-block",padding:"2px 8px",background:C.gold+"18",border:"1px solid "+C.gold+"33",borderRadius:4,fontSize:9,color:C.goldBright,fontFamily:"'Oswald',sans-serif"}},a.badge)
+      ),
+      R("button",{onClick:function(){openEdit(a);},style:{width:36,height:36,borderRadius:9,background:C.subtle,border:"1px solid "+C.cardBorder,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,marginLeft:8}},R(Icon,{n:"edit",size:15,color:C.muted}))
+    );}),
+    filtered.length===0&&R("div",{style:{background:C.card,border:"1px dashed "+C.cardBorder,borderRadius:12,padding:32,textAlign:"center"}},R("div",{style:{fontSize:13,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:14}},"No athletes yet"),R("button",{onClick:openAdd,style:{padding:"8px 18px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:8,color:C.goldBright,fontSize:12,cursor:"pointer",fontWeight:700}},"ADD FIRST ATHLETE"))
+  );
+}
+
+function CoachTab(props){
+  var athletes=props.athletes,meets=props.meets,workouts=props.workouts,results=props.results,records=props.records,onRefresh=props.onRefresh,onOpenTiming=props.onOpenTiming,logoUrl=props.logoUrl,setLogoUrl=props.setLogoUrl;
+  var _a=useState(false);var auth=_a[0];var setAuth=_a[1];
+  var _v=useState("main");var view=_v[0];var setView=_v[1];
+  var _m=useState("");var msg=_m[0];var setMsg=_m[1];
+  var logoRef=useRef(null);
+  var _lu=useState(false);var logoUp=_lu[0];var setLogoUp=_lu[1];
+  var R=React.createElement;
+  var showMsg=function(m){setMsg(m);setTimeout(function(){setMsg("");},3500);};
+  var handleLogo=async function(e){var f=e.target.files[0];if(!f)return;setLogoUp(true);var url=await db.uploadLogo(f);if(url){setLogoUrl(url);showMsg("Logo updated!");}setLogoUp(false);};
+  if(!auth)return R(PinGate,{onSuccess:function(){setAuth(true);}});
+  if(view==="roster")return R(RosterManager,{athletes:athletes,onBack:function(){setView("main");},onRefresh:onRefresh,showMsg:showMsg});
+  if(view==="workout")return R(WorkoutBuilder,{onBack:function(){setView("main");},onRefresh:onRefresh,showMsg:showMsg,athletes:athletes});
+  if(view==="meets")return R(MeetEditor,{meets:meets,onBack:function(){setView("main");},onRefresh:onRefresh,showMsg:showMsg});
+  if(view==="results")return R(ResultEditor,{athletes:athletes,meets:meets,results:results,onBack:function(){setView("main");},onRefresh:onRefresh,showMsg:showMsg});
+  if(view==="records")return R(RecordsEditor,{records:records,onBack:function(){setView("main");},onRefresh:onRefresh,showMsg:showMsg});
+  return R("div",{style:{padding:"20px 16px"}},
+    R("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}},
+      R("div",null,R("div",{style:{fontSize:10,color:C.goldDim,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em"}},"COACH PORTAL"),R("div",{style:{fontSize:24,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"DASHBOARD")),
+      R("button",{onClick:function(){setAuth(false);},style:{padding:"5px 10px",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.muted,fontSize:10,cursor:"pointer"}},"LOGOUT")
+    ),
+    msg&&R("div",{style:{background:C.goldBright+"18",border:"1px solid "+C.goldBright+"44",borderRadius:8,padding:10,marginBottom:12,fontSize:12,color:C.goldBright,fontFamily:"'Oswald',sans-serif",textAlign:"center"}},"OK "+msg),
+    R("div",{style:{display:"flex",gap:8,marginBottom:14}},
+      [{l:"ATHLETES",v:athletes.length},{l:"BOYS",v:athletes.filter(function(a){return a.gender==="boys";}).length},{l:"GIRLS",v:athletes.filter(function(a){return a.gender==="girls";}).length},{l:"W/ PHONE",v:athletes.filter(function(a){return a.parent_phone;}).length}].map(function(s){return R("div",{key:s.l,style:{flex:1,background:C.card,borderRadius:10,padding:"10px 8px",border:"1px solid "+C.cardBorder,textAlign:"center"}},R("div",{style:{fontSize:18,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright}},s.v),R("div",{style:{fontSize:8,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.1em"}},s.l));})
+    ),
+    [{i:"timer",l:"Live Meet Timing",s:"Tap athletes at each checkpoint",action:function(){onOpenTiming();}},{i:"team",l:"Manage Roster",s:athletes.length+" athletes",action:function(){setView("roster");}},{i:"cal",l:"Meet Schedule",s:"Add and edit meets for Fall 2026",action:function(){setView("meets");}},{i:"chart",l:"Edit Results",s:"Add missed athletes, fix times",action:function(){setView("results");}},{i:"bolt",l:"Post Workout",s:"Build week plan with Daniels paces",action:function(){setView("workout");}},{i:"trophy",l:"Manage Records",s:"Add and edit school records",action:function(){setView("records");}}].map(function(t){
+      return R("button",{key:t.l,onClick:t.action,style:{width:"100%",display:"flex",alignItems:"center",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:"14px 14px",marginBottom:8,cursor:"pointer",textAlign:"left"}},
+        R("div",{style:{width:40,height:40,borderRadius:10,background:C.goldBright+"18",border:"1px solid "+C.goldBright+"33",display:"flex",alignItems:"center",justifyContent:"center",marginRight:12}},R(Icon,{n:t.i,size:18,color:C.goldBright})),
+        R("div",{style:{flex:1}},R("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}},t.l),R("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:2}},t.s)),
+        R("div",{style:{color:C.muted,fontSize:20}},">")
+      );
+    }),
+    R("div",{style:{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:"14px 14px",marginBottom:8}},
+      R("div",{style:{display:"flex",alignItems:"center",gap:12}},
+        R("div",{style:{width:40,height:40,borderRadius:10,background:C.goldBright+"18",border:"1px solid "+C.goldBright+"33",display:"flex",alignItems:"center",justifyContent:"center"}},R(Icon,{n:"gear",size:18,color:C.goldBright})),
+        R("div",{style:{flex:1}},R("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}},"Upload App Logo"),R("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:2}},logoUrl?"Custom logo active":"Using default logo")),
+        R("input",{ref:logoRef,type:"file",accept:"image/*",style:{display:"none"},onChange:handleLogo}),
+        R("button",{onClick:function(){if(logoRef.current)logoRef.current.click();},style:{padding:"6px 12px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:8,color:C.goldBright,fontSize:11,fontFamily:"'Oswald',sans-serif",cursor:"pointer"}},logoUp?"...":"UPLOAD")
+      )
+    ),
+    R("div",{style:{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:"14px 14px"}},
+      R("div",{style:{display:"flex",alignItems:"center",gap:12}},
+        R("div",{style:{width:40,height:40,borderRadius:10,background:C.goldBright+"18",border:"1px solid "+C.goldBright+"33",display:"flex",alignItems:"center",justifyContent:"center"}},R(Icon,{n:"shirt",size:18,color:C.goldBright})),
+        R("div",{style:{flex:1}},R("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}},"BSN Apparel Store"),R("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:2}},"Official team gear link")),
+        R("button",{onClick:function(){window.open("https://bsnsports.com","_blank");},style:{padding:"6px 12px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:8,color:C.goldBright,fontSize:11,fontFamily:"'Oswald',sans-serif",cursor:"pointer"}},"OPEN")
+      )
+    )
+  );
+}
+
+function AthleteSelector(props){
+  var athletes=props.athletes,favIds=props.favIds,onToggleFav=props.onToggleFav,onSelect=props.onSelect,onClose=props.onClose;
+  var _g=useState("all");var gf=_g[0];var setGf=_g[1];
+  var R=React.createElement;
+  var list=athletes.filter(function(a){return gf==="all"||a.gender===gf;});
+  var Row=function(rp){
+    var a=rp.a;
+    return R("div",{style:{display:"flex",alignItems:"center",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:"11px 12px",marginBottom:8}},
+      R("button",{onClick:function(){onToggleFav(a.id);},style:{background:"none",border:"none",cursor:"pointer",marginRight:8}},
+        R("svg",{width:18,height:18,viewBox:"0 0 24 24",fill:favIds.indexOf(a.id)>=0?C.goldBright:"none",stroke:favIds.indexOf(a.id)>=0?C.goldBright:C.muted,strokeWidth:2},R("polygon",{points:"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"}))
+      ),
+      R("button",{onClick:function(){onSelect(a);},style:{flex:1,display:"flex",alignItems:"center",background:"none",border:"none",cursor:"pointer",textAlign:"left"}},
+        R(Avatar,{athlete:a,size:38}),
+        R("div",{style:{flex:1,marginLeft:12}},R("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}},a.name),R("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:1}},"GR "+a.grade+" - "+(a.pr_3k||"--"))),
+        R("div",{style:{fontSize:20,color:C.muted}},">")
+      )
+    );
+  };
+  return R("div",{style:{position:"absolute",inset:0,background:"rgba(0,0,0,0.95)",zIndex:50,display:"flex",flexDirection:"column"}},
+    R("div",{style:{background:C.card,borderBottom:"1px solid "+C.cardBorder,paddingTop:58,paddingBottom:14,paddingLeft:18,paddingRight:18}},
+      R("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}},R("div",{style:{fontSize:20,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"SELECT ATHLETE"),R("button",{onClick:onClose,style:{background:"none",border:"none",cursor:"pointer"}},R(Icon,{n:"x",size:22,color:C.muted}))),
+      R("div",{style:{display:"flex",background:C.black,borderRadius:10,padding:3,border:"1px solid "+C.cardBorder}},
+        ["all","boys","girls"].map(function(g){return R("button",{key:g,onClick:function(){setGf(g);},style:{flex:1,padding:"8px 0",background:gf===g?"linear-gradient(135deg,#1A1000,#2A1800)":"transparent",border:"none",borderRadius:8,color:gf===g?C.goldBright:C.muted,fontSize:11,cursor:"pointer",fontWeight:gf===g?700:400}},g.toUpperCase());})
+      )
+    ),
+    R("div",{style:{flex:1,overflowY:"auto",padding:"12px 16px"}},
+      favIds.length>0&&R("div",null,R("div",{style:{fontSize:10,color:C.goldBright,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.3em",marginBottom:10}},"STARRED"),athletes.filter(function(a){return favIds.indexOf(a.id)>=0;}).map(function(a){return R(Row,{key:a.id,a:a});}),R("div",{style:{height:1,background:C.cardBorder,margin:"12px 0"}})),
+      R("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.3em",marginBottom:10}},"ALL ATHLETES"),
+      list.map(function(a){return R(Row,{key:a.id,a:a});})
+    )
+  );
+}
+
+function NavBar(props){
+  var active=props.active,onSelect=props.onSelect;
+  var R=React.createElement;
+  var tabs=[{id:"athletes",i:"team",l:"ATHLETES"},{id:"schedule",i:"cal",l:"SCHEDULE"},{id:"home",i:"home",l:"HOME"},{id:"train",i:"bolt",l:"TRAIN"},{id:"records",i:"trophy",l:"RECORDS"},{id:"coach",i:"flag",l:"COACH"}];
+  return R("div",{style:{position:"absolute",bottom:0,left:0,right:0,background:C.black,borderTop:"1px solid "+C.cardBorder,display:"flex",paddingBottom:18,paddingTop:8}},
+    tabs.map(function(t){
+      return R("button",{key:t.id,onClick:function(){onSelect(t.id);},style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3,background:"none",border:"none",cursor:"pointer",padding:"3px 0"}},
+        R(Icon,{n:t.i,size:19,color:active===t.id?C.goldBright:C.muted}),
+        R("div",{style:{fontSize:7,color:active===t.id?C.goldBright:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.08em",fontWeight:active===t.id?700:400}},t.l),
+        active===t.id&&R("div",{style:{width:3,height:3,borderRadius:"50%",background:C.goldBright}})
+      );
+    })
+  );
+}
+
+function App(){
+  var R=React.createElement;
+  var _sp=useState(true);var splash=_sp[0];var setSplash=_sp[1];
+  var _tb=useState("home");var tab=_tb[0];var setTab=_tb[1];
+  var _si=useState(0);var sloganIdx=_si[0];var setSloganIdx=_si[1];
+  var _fi=useState([]);var favIds=_fi[0];var setFavIds=_fi[1];
+  var _ss=useState(false);var showSel=_ss[0];var setShowSel=_ss[1];
+  var _va=useState(null);var viewingA=_va[0];var setViewingA=_va[1];
+  var _st=useState(false);var showTiming=_st[0];var setShowTiming=_st[1];
+  var _at=useState([]);var athletes=_at[0];var setAthletes=_at[1];
+  var _me=useState([]);var meets=_me[0];var setMeets=_me[1];
+  var _wo=useState([]);var workouts=_wo[0];var setWorkouts=_wo[1];
+  var _re=useState([]);var results=_re[0];var setResults=_re[1];
+  var _rc=useState([]);var records=_rc[0];var setRecords=_rc[1];
+  var _lo=useState(true);var loading=_lo[0];var setLoading=_lo[1];
+  var _er=useState(false);var dbErr=_er[0];var setDbErr=_er[1];
+  var _lu=useState(null);var logoUrl=_lu[0];var setLogoUrl=_lu[1];
+
+  var fetchAll=useCallback(async function(){
+    try{
+      var res=await Promise.all([
+        db.get("athletes","?active=eq.true&order=grade.asc"),
+        db.get("meets","?order=created_at.asc"),
+        db.get("workouts","?order=created_at.desc&limit=14"),
+        db.get("results","?order=created_at.desc"),
+        db.get("records","?order=event_id.asc,mark_sortable.asc")
+      ]);
+      if(Array.isArray(res[0]))setAthletes(res[0]);else setDbErr(true);
+      if(Array.isArray(res[1]))setMeets(res[1]);
+      if(Array.isArray(res[2]))setWorkouts(res[2]);
+      if(Array.isArray(res[3]))setResults(res[3]);
+      if(Array.isArray(res[4]))setRecords(res[4]);
+      fetch(SUPA_URL+"/storage/v1/object/public/app-assets/logo.png",{method:"HEAD"}).then(function(r){if(r.ok)setLogoUrl(SUPA_URL+"/storage/v1/object/public/app-assets/logo.png");}).catch(function(){});
+    }catch(e){console.error(e);setDbErr(true);}
+    setLoading(false);
+  },[]);
+
+  useEffect(function(){fetchAll();},[]);
+  useEffect(function(){var t=setInterval(function(){setSloganIdx(function(i){return (i+1)%SLOGANS.length;});},6000);return function(){clearInterval(t);};},[]);
+
+  var toggleFav=function(id){setFavIds(function(fs){return fs.indexOf(id)>=0?fs.filter(function(f){return f!==id;}):[].concat(fs,[id]);});};
+  var viewAthlete=function(a){setViewingA(a);setShowSel(false);};
+  var selTab=function(t){setTab(t);setViewingA(null);setShowTiming(false);};
+  var isWide=window.innerWidth>440;
+
+  return R("div",{style:{width:"100%",maxWidth:430,height:"100dvh",maxHeight:isWide?932:"100dvh",margin:"0 auto",background:C.black,position:"relative",overflow:"hidden",display:"flex",flexDirection:"column",boxShadow:isWide?"0 0 80px rgba(0,0,0,0.95)":"none",borderRadius:isWide?44:0}},
+    splash&&R(Splash,{onDone:function(){setSplash(false);},logoUrl:logoUrl}),
+    showSel&&R(AthleteSelector,{athletes:athletes,favIds:favIds,onToggleFav:toggleFav,onSelect:viewAthlete,onClose:function(){setShowSel(false);}}),
+    showTiming&&R(LiveTiming,{athletes:athletes,meets:meets,onClose:function(){setShowTiming(false);}}),
+    viewingA&&!showTiming&&R("div",{style:{position:"absolute",inset:0,background:C.black,zIndex:30,display:"flex",flexDirection:"column"}},
+      R("div",{style:{flex:1,overflowY:"auto",paddingBottom:88}},R(AthleteProfile,{athlete:viewingA,results:results,meets:meets,onBack:function(){setViewingA(null);},isFav:favIds.indexOf(viewingA.id)>=0,onToggleFav:toggleFav})),
+      R(NavBar,{active:tab,onSelect:selTab})
+    ),
+    !viewingA&&!showTiming&&R("div",{style:{display:"contents"}},
+      R("div",{style:{flex:1,overflowY:"auto",paddingBottom:88}},
+        loading?R("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"60vh",gap:16}},R(Logo,{size:70,logoUrl:logoUrl}),R("div",{style:{fontSize:12,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em"}},"LOADING THE HERD..."))
+        :dbErr?R("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"60vh",gap:16,padding:24}},
+          R(Logo,{size:60,logoUrl:logoUrl}),
+          R("div",{style:{fontSize:16,color:C.white,fontFamily:"'Oswald',sans-serif",fontWeight:700,textAlign:"center"}},"CONNECTION ERROR"),
+          R("div",{style:{fontSize:12,color:C.muted,fontFamily:"'Oswald',sans-serif",textAlign:"center",lineHeight:1.6}},"Could not reach Supabase."),
+          R("button",{onClick:fetchAll,style:{padding:"10px 24px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:10,color:C.goldBright,fontSize:13,fontWeight:700,cursor:"pointer"}},"RETRY")
+        )
+        :R("div",null,
+          R(Header,{slogan:SLOGANS[sloganIdx],onLogoPress:function(){setShowSel(true);},logoUrl:logoUrl}),
+          tab==="home"&&R(HomeTab,{athletes:athletes,meets:meets,favIds:favIds,onOpenSelector:function(){setShowSel(true);},logoUrl:logoUrl,results:results,onViewAthlete:viewAthlete}),
+          tab==="athletes"&&R(AthletesTab,{athletes:athletes,onView:viewAthlete,favIds:favIds,onToggleFav:toggleFav}),
+          tab==="schedule"&&R(ScheduleTab,{meets:meets}),
+          tab==="train"&&R(TrainTab,{workouts:workouts,athletes:athletes}),
+          tab==="records"&&R(RecordsTab,{records:records}),
+          tab==="coach"&&R(CoachTab,{athletes:athletes,meets:meets,workouts:workouts,results:results,records:records,onRefresh:fetchAll,onOpenTiming:function(){setShowTiming(true);},logoUrl:logoUrl,setLogoUrl:setLogoUrl})
+        )
+      ),
+      R(NavBar,{active:tab,onSelect:selTab})
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App,null));
+
 </script>
 </body>
 </html>
-
 
