@@ -46,7 +46,7 @@ const C={
   alert:"#E8A020",red:"#E05A2B"
 };
 
-const SLOGANS=["BUILT IN BENTON","PROTECT THE HERD","EVERY MILE BUILDS THE HERD","ITS BETTER IN BENTON"];
+const SLOGANS=["BUILT IN BENTON"];
 const DAYS=["MON","TUE","WED","THU","FRI","SAT","SUN"];
 const BADGES=["","Emerging Leader","Quiet Leader","Team Connector","Accountability Leader","Most Encouraging","Future Captain","Positive Competitor"];
 const PACE_TYPES=[
@@ -116,6 +116,43 @@ function calcGoal(a,evKey){
   if(pr)return t2s(pr)*sm;
   if(a.pr_3k){var pm=t2s(a.pr_3k)/3000;if(evKey==="1600m")return pm*1600*0.94*sm;if(evKey==="800m")return pm*800*0.90*sm;if(evKey==="400m")return pm*400*0.86*sm;}
   return null;
+}
+
+// Track-to-XC prediction engine
+// Uses Riegel formula: T2 = T1 * (D2/D1)^1.06
+function riegelPredict(knownTime, knownDist, targetDist){
+  if(!knownTime||knownTime>=9999)return null;
+  return knownTime * Math.pow(targetDist/knownDist, 1.06);
+}
+function calcTrackPredictions(athlete){
+  var preds = [];
+  var sources = [];
+  // Collect all known track PRs
+  if(athlete.pr_400) sources.push({time:t2s(athlete.pr_400),dist:400,label:"400m"});
+  if(athlete.pr_800) sources.push({time:t2s(athlete.pr_800),dist:800,label:"800m"});
+  if(athlete.pr_1600) sources.push({time:t2s(athlete.pr_1600),dist:1600,label:"1600m"});
+  if(athlete.pr_baseline) sources.push({time:t2s(athlete.pr_baseline),dist:1609,label:"1mi baseline"});
+  if(sources.length===0) return null;
+  // Predict 3K from each source
+  var pred3k = sources.map(function(s){
+    return {from:s.label, sec:riegelPredict(s.time,s.dist,3000)};
+  }).filter(function(p){return p.sec&&p.sec<9999;});
+  if(pred3k.length===0) return null;
+  // Average all predictions for best estimate
+  var avg3k = pred3k.reduce(function(sum,p){return sum+p.sec;},0)/pred3k.length;
+  // Best (fastest) single prediction
+  var best3k = Math.min.apply(null, pred3k.map(function(p){return p.sec;}));
+  // Also predict other distances from best available
+  var bestSrc = sources.reduce(function(a,b){return a.dist>b.dist?a:b;}); // use longest for cross-predict
+  return {
+    pred3k: s2t(avg3k),
+    pred3kBest: s2t(best3k),
+    pred5k: s2t(riegelPredict(bestSrc.time,bestSrc.dist,5000)),
+    pred1600: athlete.pr_1600?null:s2t(riegelPredict(bestSrc.time,bestSrc.dist,1600)),
+    pred800: athlete.pr_800?null:s2t(riegelPredict(bestSrc.time,bestSrc.dist,800)),
+    sources: pred3k,
+    paces: calcPaces(s2t(avg3k))
+  };
 }
 function calcProjections(athlete,results,meets){
   var mr=results.filter(function(r){return r.athlete_id===athlete.id&&r.time&&r.time.indexOf("_split")===-1;}).map(function(r){var mt=meets.find(function(m){return m.id===r.meet_id;});return Object.assign({},r,{meet:mt});}).sort(function(a,b){return new Date(safeGet(a.meet,"date")||0)-new Date(safeGet(b.meet,"date")||0);});
@@ -212,7 +249,7 @@ function Splash(props){
         React.createElement("div",{style:{fontSize:30,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,letterSpacing:"0.06em",lineHeight:1.15}},"CROSS COUNTRY"),
         React.createElement("div",{style:{fontSize:18,fontFamily:"'Oswald',sans-serif",fontWeight:400,color:C.offWhite,letterSpacing:"0.2em"}},"TRACK and FIELD")
       ),
-      React.createElement("div",{style:{marginTop:10,opacity:ph>=3?1:0,fontSize:14,letterSpacing:"0.35em",color:C.goldBright,fontFamily:"'Oswald',sans-serif",fontWeight:700}},"THE HERD"),
+      React.createElement("div",{style:{marginTop:10,opacity:ph>=3?1:0,fontSize:14,letterSpacing:"0.35em",color:C.goldBright,fontFamily:"'Oswald',sans-serif",fontWeight:700}},"FALL 2026"),
       React.createElement("div",{style:{width:ph>=3?180:0,height:1,background:"linear-gradient(to right,transparent,"+C.gold+",transparent)",marginTop:14,marginBottom:14,transition:"width 0.6s ease"}}),
       React.createElement("div",{style:{opacity:ph>=3?1:0,transition:"opacity 0.6s ease",fontSize:12,color:C.offWhite,fontFamily:"'Oswald',sans-serif",fontStyle:"italic",letterSpacing:"0.15em"}},"BUILT IN BENTON"),
       ph>=3&&React.createElement("div",{style:{position:"absolute",bottom:60,display:"flex",gap:8}},
@@ -230,7 +267,7 @@ function Header(props){
       React.createElement("div",null,
         React.createElement("div",{style:{fontSize:8,letterSpacing:"0.5em",color:C.goldDim,fontFamily:"'Oswald',sans-serif",fontWeight:600}},"BENTON CENTRAL"),
         React.createElement("div",{style:{fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,letterSpacing:"0.03em",lineHeight:1.15}},"CROSS COUNTRY / TRACK and FIELD"),
-        React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginTop:2}},"THE HERD - FALL 2026")
+        React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginTop:2}},"FALL 2026")
       ),
       React.createElement("button",{onClick:onLogoPress,style:{background:"none",border:"none",cursor:"pointer",filter:"drop-shadow(0 0 8px "+C.goldBright+"44)",marginLeft:10}},React.createElement(Logo,{size:46,logoUrl:logoUrl}))
     ),
@@ -640,13 +677,7 @@ function MyAthleteCard(props){
   var next=meets.filter(function(m){return m.status==="next";})[0];
   var goalSec=next?calcGoal(athlete,"3K XC"):null;
   var weather=useWeather(next&&next.city,next&&next.date);
-  var _ai=useState(false);var showAlert=_ai[0];var setShowAlert=_ai[1];
-  var _ph=useState(athlete.parent_phone||"");var phone=_ph[0];var setPhone=_ph[1];
-  var _sv=useState(false);var saving=_sv[0];var setSaving=_sv[1];
-  function savePhone(){
-    setSaving(true);
-    db.patch("athletes",athlete.id,{parent_phone:phone}).then(function(){setSaving(false);setShowAlert(false);});
-  }
+
   return React.createElement("div",{style:{background:"linear-gradient(135deg,#1A1000,"+C.card+")",border:"1px solid "+C.gold+"55",borderRadius:14,padding:16,marginBottom:10}},
     React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:12}},
       React.createElement(Avatar,{athlete:athlete,size:52,border:true}),
@@ -690,13 +721,7 @@ function MyAthleteCard(props){
         next.city&&React.createElement("div",{style:{marginLeft:"auto",fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif"}},next.city)
       )
     ),
-    !showAlert
-      ?React.createElement("button",{onClick:function(){setShowAlert(true);},style:{width:"100%",padding:"8px",background:athlete.parent_phone?"transparent":"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+(athlete.parent_phone?C.cardBorder:C.goldBright),borderRadius:8,color:athlete.parent_phone?C.muted:C.goldBright,fontSize:11,fontFamily:"'Oswald',sans-serif",cursor:"pointer"}},athlete.parent_phone?"Alerts active - tap to update":"Sign up for in-app alerts")
-      :React.createElement("div",{style:{display:"flex",gap:8}},
-        React.createElement("input",{placeholder:"Your phone number",value:phone,onChange:function(e){setPhone(e.target.value);},style:{flex:1,padding:"8px 10px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.white,fontFamily:"'Oswald',sans-serif",fontSize:12}}),
-        React.createElement("button",{onClick:savePhone,disabled:saving,style:{padding:"8px 14px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:8,color:C.goldBright,fontSize:11,fontFamily:"'Oswald',sans-serif",cursor:"pointer"}},saving?"...":"SAVE"),
-        React.createElement("button",{onClick:function(){setShowAlert(false);},style:{padding:"8px 10px",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.muted,fontSize:11,cursor:"pointer"}},"X")
-      )
+
   );
 }
 
@@ -707,8 +732,25 @@ function HomeTab(props){
   return React.createElement("div",{style:{padding:0}},
     React.createElement("div",{style:{background:"linear-gradient(180deg,#0A0800,"+C.black+")",padding:"20px 18px 16px",borderBottom:"1px solid "+C.cardBorder,position:"relative"}},
       React.createElement("div",{style:{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(to right,"+C.goldDim+","+C.goldBright+","+C.goldDim+")"}}),
-      React.createElement("div",{style:{fontSize:9,color:C.goldDim,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.4em",marginBottom:4}},"FALL 2026"),
-      React.createElement("div",{style:{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,lineHeight:1}},"THE HERD"),
+      (function(){
+    var now=new Date(); now.setHours(0,0,0,0);
+    var ss=new Date("2026-08-03");
+    var days=Math.ceil((ss-now)/(1000*60*60*24));
+    if(days>0) return React.createElement("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:10}},
+      React.createElement("div",{style:{textAlign:"center",minWidth:44}},
+        React.createElement("div",{style:{fontSize:34,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright,lineHeight:1}},String(days)),
+        React.createElement("div",{style:{fontSize:8,color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em"}},"DAYS")
+      ),
+      React.createElement("div",{style:{width:1,height:34,background:C.cardBorder}}),
+      React.createElement("div",null,
+        React.createElement("div",{style:{fontSize:9,color:C.goldDim,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em"}},"SEASON BEGINS"),
+        React.createElement("div",{style:{fontSize:13,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"August 3rd, 2026"),
+        React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"First Official Practice")
+      )
+    );
+    return React.createElement("div",{style:{fontSize:9,color:C.goldDim,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.4em",marginBottom:4}},"FALL 2026");
+  }()),
+      React.createElement("div",{style:{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,lineHeight:1}},"FALL 2026"),
       React.createElement("div",{style:{fontSize:11,color:C.gold,fontFamily:"'Oswald',sans-serif",fontStyle:"italic",marginTop:5,letterSpacing:"0.15em"}},"BUILT IN BENTON")
     ),
     React.createElement("div",{style:{padding:"14px 14px"}},
@@ -723,12 +765,7 @@ function HomeTab(props){
         )
         :favAthletes.map(function(a){return React.createElement(MyAthleteCard,{key:a.id,athlete:a,meets:meets,results:results,onView:onViewAthlete});}),
       lastMeet&&React.createElement(MeetRecapCard,{meet:lastMeet,athletes:athletes,results:results,onViewAthlete:onViewAthlete}),
-      React.createElement("div",{style:{background:"linear-gradient(135deg,#180E00,"+C.card+")",border:"1px solid "+C.gold+"44",borderRadius:14,padding:16,marginBottom:16}},
-        React.createElement("div",{style:{fontSize:9,color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.35em",marginBottom:8}},"TEAM APPAREL"),
-        React.createElement("div",{style:{fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,marginBottom:4}},"BC Track and XC Store"),
-        React.createElement("div",{style:{fontSize:12,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:12}},"Official team gear - BSN Sports"),
-        React.createElement("button",{onClick:function(){window.open("https://bsnsports.com","_blank");},style:{padding:"8px 18px",background:"linear-gradient(135deg,"+C.gold+","+C.goldBright+")",border:"none",borderRadius:8,color:C.black,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Oswald',sans-serif",letterSpacing:"0.1em"}},"SHOP NOW")
-      ),
+      React.createElement(HomeApparelCard,null),
       React.createElement("div",{style:{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:14,padding:14,marginBottom:16,overflow:"hidden"}},
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:12}},
           React.createElement(Icon,{n:"fb",size:16,color:C.goldBright}),
@@ -749,7 +786,7 @@ function AthletesTab(props){
   return React.createElement("div",{style:{padding:"20px 16px"}},
     React.createElement("div",{style:{marginBottom:14}},
       React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em"}},"TEAM STANDINGS"),
-      React.createElement("div",{style:{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"THE HERD")
+      React.createElement("div",{style:{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},"FALL 2026")
     ),
     React.createElement("div",{style:{display:"flex",background:C.card,borderRadius:10,padding:3,border:"1px solid "+C.cardBorder,marginBottom:14}},
       ["boys","girls"].map(function(g){return React.createElement("button",{key:g,onClick:function(){setGender(g);},style:{flex:1,padding:"9px 0",background:gender===g?"linear-gradient(135deg,#1A1000,#2A1800)":"transparent",border:"none",borderRadius:8,color:gender===g?C.goldBright:C.muted,fontSize:12,cursor:"pointer",fontWeight:gender===g?700:400,fontFamily:"'Oswald',sans-serif"}},g.toUpperCase());})
@@ -783,14 +820,15 @@ function AthleteProfile(props){
   var athlete=props.athlete;var results=props.results;var meets=props.meets;var onBack=props.onBack;var isFav=props.isFav;var onToggleFav=props.onToggleFav;
   var _s=useState("overview");var sub=_s[0];var setSub=_s[1];
   var a=athlete;
-  var baseline=a.pr_baseline||a.pr_3k;
+  var baseline=a.pr_baseline||a.pr_1600||a.pr_3k;
   var paces=calcPaces(baseline);
+  var trackPreds=calcTrackPredictions(a);
   var allR=results.filter(function(r){return r.athlete_id===a.id;});
   var myR=allR.filter(function(r){return r.time&&r.time.indexOf("_split")===-1;}).map(function(r){var mt=meets.filter(function(m){return m.id===r.meet_id;})[0];return Object.assign({},r,{meet:mt});}).sort(function(x,y){return new Date(safeGet(x.meet,"date")||0)-new Date(safeGet(y.meet,"date")||0);});
   var proj=calcProjections(a,results,meets);
   var ageMap={6:11,7:12,8:13,9:14,10:15,11:16,12:17};
   var age=ageMap[a.grade]||(a.grade+5);
-  var tabs=["overview","paces","meets","projections"];
+  var tabs=["overview","track","paces","meets","projections"];
   return React.createElement("div",{style:{display:"flex",flexDirection:"column",height:"100%"}},
     React.createElement("div",{style:{background:"linear-gradient(160deg,#0A0800,"+C.black+")",paddingTop:58,paddingBottom:0,paddingLeft:18,paddingRight:18,borderBottom:"1px solid "+C.cardBorder,position:"relative",overflow:"hidden"}},
       React.createElement("div",{style:{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(to right,"+C.goldDim+","+C.goldBright+","+C.goldDim+")"}}),
@@ -842,6 +880,65 @@ function AthleteProfile(props){
               React.createElement("div",{style:{fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}},r.v)
             );
           })
+        )
+      ),
+      sub==="track"&&React.createElement("div",{style:{padding:"18px 16px"}},
+        React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:14}},"TRACK PRs AND PREDICTIONS"),
+        // Track PRs card
+        React.createElement("div",{style:{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:14,padding:16,marginBottom:14}},
+          React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:12}},"CURRENT TRACK PRs"),
+          [
+            {l:"400m",v:a.pr_400||"--",note:"Sprint endurance"},
+            {l:"800m",v:a.pr_800||"--",note:"Middle distance"},
+            {l:"1600m",v:a.pr_1600||"--",note:"Mile"},
+            {l:"5K XC",v:a.pr_5k||"--",note:"5K cross country"}
+          ].map(function(r,i,arr){
+            return React.createElement("div",{key:r.l,style:{display:"flex",alignItems:"center",paddingBottom:10,marginBottom:10,borderBottom:i<arr.length-1?"1px solid "+C.cardBorder:"none"}},
+              React.createElement("div",{style:{flex:1}},
+                React.createElement("div",{style:{fontSize:13,color:C.white,fontFamily:"'Oswald',sans-serif",fontWeight:600}},r.l),
+                React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif"}},r.note)
+              ),
+              React.createElement("div",{style:{fontSize:18,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:r.v==="--"?C.muted:C.goldBright}},r.v)
+            );
+          })
+        ),
+        // AI Predictions from track times
+        trackPreds&&React.createElement("div",{style:{background:"linear-gradient(135deg,#180E00,"+C.card+")",border:"1px solid "+C.gold+"44",borderRadius:14,padding:16,marginBottom:14}},
+          React.createElement("div",{style:{fontSize:9,color:C.gold,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:6}},"XC PREDICTIONS FROM TRACK TIMES"),
+          React.createElement("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:12,lineHeight:1.5}},"Using Riegel formula from "+trackPreds.sources.map(function(s){return s.from;}).join(", ")),
+          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}},
+            React.createElement("div",{style:{background:C.black+"66",borderRadius:10,padding:"12px 14px",textAlign:"center"}},
+              React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.15em",marginBottom:4}},"3K XC PREDICTION"),
+              React.createElement("div",{style:{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright}},trackPreds.pred3k),
+              React.createElement("div",{style:{fontSize:9,color:C.gold,fontFamily:"'Oswald',sans-serif"}},"avg of all sources")
+            ),
+            React.createElement("div",{style:{background:C.black+"66",borderRadius:10,padding:"12px 14px",textAlign:"center"}},
+              React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.15em",marginBottom:4}},"BEST CASE 3K"),
+              React.createElement("div",{style:{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.gold}},trackPreds.pred3kBest),
+              React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"fastest source")
+            )
+          ),
+          trackPreds.sources.map(function(s){
+            return React.createElement("div",{key:s.from,style:{display:"flex",justifyContent:"space-between",alignItems:"center",paddingBottom:6,marginBottom:6,borderBottom:"1px solid "+C.cardBorder+"44"}},
+              React.createElement("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"From "+s.from),
+              React.createElement("div",{style:{fontSize:13,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.offWhite}},s2t(s.sec))
+            );
+          }),
+          trackPreds.paces&&React.createElement("div",{style:{marginTop:12,padding:"10px 12px",background:C.subtle,borderRadius:8}},
+            React.createElement("div",{style:{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em",marginBottom:8}},"PREDICTED XC TRAINING PACES"),
+            React.createElement("div",{style:{display:"flex",gap:12,flexWrap:"wrap"}},
+              [{k:"easy",l:"EASY",c:C.greenLight},{k:"threshold",l:"THRESH",c:C.goldBright},{k:"interval",l:"INTRVL",c:C.alert},{k:"race",l:"RACE",c:C.white}].map(function(p){
+                return React.createElement("div",{key:p.k,style:{textAlign:"center"}},
+                  React.createElement("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:p.c}},trackPreds.paces[p.k]||"--"),
+                  React.createElement("div",{style:{fontSize:8,color:C.muted,fontFamily:"'Oswald',sans-serif"}},p.l)
+                );
+              })
+            )
+          )
+        ),
+        !trackPreds&&React.createElement("div",{style:{background:C.card,border:"1px dashed "+C.cardBorder,borderRadius:12,padding:24,textAlign:"center"}},
+          React.createElement("div",{style:{fontSize:13,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:6}},"No track PRs entered yet"),
+          React.createElement("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"Add 400m, 800m, or 1600m times in the Coach Portal to generate XC predictions")
         )
       ),
       sub==="paces"&&paces&&React.createElement("div",{style:{padding:"18px 16px"}},
@@ -1469,12 +1566,12 @@ function RosterManager(props){
   var R=React.createElement;
   var inp=function(ex){return Object.assign({width:"100%",padding:"11px 12px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.white,fontFamily:"'Oswald',sans-serif",fontSize:13},ex||{});};
   var filtered=[].concat(athletes.filter(function(a){return gf==="all"||a.gender===gf;})).sort(function(a,b){return t2s(a.pr_3k||"99:99")-t2s(b.pr_3k||"99:99");});
-  var openEdit=function(a){setForm({id:a.id,name:a.name,short_name:a.short_name||"",grade:a.grade,gender:a.gender,pr_3k:a.pr_3k||"",pr_5k:a.pr_5k||"",pr_1600:a.pr_1600||"",pr_800:a.pr_800||"",pr_baseline:a.pr_baseline||"",attendance:a.attendance||100,weekly_mileage:a.weekly_mileage||0,parent_phone:a.parent_phone||"",badge:a.badge||"",photo_url:a.photo_url||""});setPhotoPreview(a.photo_url||null);setSv("edit");};
+  var openEdit=function(a){setForm({id:a.id,name:a.name,short_name:a.short_name||"",grade:a.grade,gender:a.gender,pr_3k:a.pr_3k||"",pr_400:a.pr_400||"",pr_5k:a.pr_5k||"",pr_1600:a.pr_1600||"",pr_800:a.pr_800||"",pr_baseline:a.pr_baseline||"",attendance:a.attendance||100,weekly_mileage:a.weekly_mileage||0,parent_phone:a.parent_phone||"",badge:a.badge||"",photo_url:a.photo_url||""});setPhotoPreview(a.photo_url||null);setSv("edit");};
   var openAdd=function(){setForm({grade:9,gender:"boys",attendance:100,weekly_mileage:0});setPhotoPreview(null);setSv("add");};
   var autoShort=function(n){if(!n)return"";var p=n.trim().split(" ");return p[0]+" "+p[p.length-1][0]+".";};
   var handlePhoto=async function(e){var f=e.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(ev){setPhotoPreview(ev.target.result);};rd.readAsDataURL(f);if(sv==="edit"&&form.id){setUploading(true);var url=await db.uploadPhoto(form.id,f);if(url){await db.patch("athletes",form.id,{photo_url:url});setForm(function(x){return Object.assign({},x,{photo_url:url});});showMsg("Photo uploaded!");}setUploading(false);}else{setForm(function(x){return Object.assign({},x,{_photoFile:f});});}};
-  var saveEdit=async function(){if(!form.id)return;setLoading(true);await db.patch("athletes",form.id,{name:form.name.trim(),short_name:form.short_name||autoShort(form.name),grade:parseInt(form.grade),gender:form.gender,pr_3k:form.pr_3k||null,pr_5k:form.pr_5k||null,pr_1600:form.pr_1600||null,pr_800:form.pr_800||null,pr_baseline:form.pr_baseline||null,attendance:parseInt(form.attendance)||100,weekly_mileage:parseInt(form.weekly_mileage)||0,parent_phone:form.parent_phone||null,badge:form.badge||null});setLoading(false);setForm({});setSv("list");onRefresh();showMsg("Updated!");};
-  var saveAdd=async function(){if(!form.name)return;setLoading(true);var res=await db.post("athletes",{name:form.name.trim(),short_name:form.short_name||autoShort(form.name),grade:parseInt(form.grade)||9,gender:form.gender||"boys",pr_3k:form.pr_3k||null,pr_5k:form.pr_5k||null,pr_1600:form.pr_1600||null,pr_800:form.pr_800||null,pr_baseline:form.pr_baseline||null,attendance:parseInt(form.attendance)||100,weekly_mileage:parseInt(form.weekly_mileage)||0,parent_phone:form.parent_phone||null,badge:form.badge||null,active:true});var nid=Array.isArray(res)?(res[0]&&res[0].id):res&&res.id;if(nid&&form._photoFile){var url=await db.uploadPhoto(nid,form._photoFile);if(url)await db.patch("athletes",nid,{photo_url:url});}setLoading(false);setForm({});setSv("list");onRefresh();showMsg(form.name+" added!");};
+  var saveEdit=async function(){if(!form.id)return;setLoading(true);await db.patch("athletes",form.id,{name:form.name.trim(),short_name:form.short_name||autoShort(form.name),grade:parseInt(form.grade),gender:form.gender,pr_3k:form.pr_3k||null,pr_400:form.pr_400||null,pr_5k:form.pr_5k||null,pr_1600:form.pr_1600||null,pr_800:form.pr_800||null,pr_baseline:form.pr_baseline||null,attendance:parseInt(form.attendance)||100,weekly_mileage:parseInt(form.weekly_mileage)||0,parent_phone:form.parent_phone||null,badge:form.badge||null});setLoading(false);setForm({});setSv("list");onRefresh();showMsg("Updated!");};
+  var saveAdd=async function(){if(!form.name)return;setLoading(true);var res=await db.post("athletes",{name:form.name.trim(),short_name:form.short_name||autoShort(form.name),grade:parseInt(form.grade)||9,gender:form.gender||"boys",pr_3k:form.pr_3k||null,pr_400:form.pr_400||null,pr_5k:form.pr_5k||null,pr_1600:form.pr_1600||null,pr_800:form.pr_800||null,pr_baseline:form.pr_baseline||null,attendance:parseInt(form.attendance)||100,weekly_mileage:parseInt(form.weekly_mileage)||0,parent_phone:form.parent_phone||null,badge:form.badge||null,active:true});var nid=Array.isArray(res)?(res[0]&&res[0].id):res&&res.id;if(nid&&form._photoFile){var url=await db.uploadPhoto(nid,form._photoFile);if(url)await db.patch("athletes",nid,{photo_url:url});}setLoading(false);setForm({});setSv("list");onRefresh();showMsg(form.name+" added!");};
   var doRem=async function(){setLoading(true);await db.patch("athletes",confirmA.id,{active:false});setLoading(false);setConfirmA(null);setSv("list");onRefresh();showMsg(confirmA.name+" removed.");};
 
   if(sv==="confirm_remove") return R("div",{style:{padding:"20px 16px"}},
@@ -1511,6 +1608,7 @@ function RosterManager(props){
         R("select",{value:form.gender||"boys",onChange:function(e){setForm(Object.assign({},form,{gender:e.target.value}));},style:inp()},R("option",{value:"boys"},"Boys"),R("option",{value:"girls"},"Girls"))
       ),
       R("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:6}},
+        R("input",{placeholder:"400m PR",value:form.pr_400||"",onChange:function(e){setForm(Object.assign({},form,{pr_400:e.target.value}));},style:inp()}),
         R("input",{placeholder:"3K PR",value:form.pr_3k||"",onChange:function(e){setForm(Object.assign({},form,{pr_3k:e.target.value}));},style:inp()}),
         R("input",{placeholder:"5K PR",value:form.pr_5k||"",onChange:function(e){setForm(Object.assign({},form,{pr_5k:e.target.value}));},style:inp()})
       ),
@@ -1567,6 +1665,72 @@ function RosterManager(props){
   );
 }
 
+
+
+function HomeApparelCard(){
+  var R=React.createElement;
+  var now=new Date();
+  var open=new Date("2026-07-20"); open.setHours(0,0,0,0);
+  var close=new Date("2026-08-07"); close.setHours(23,59,59,0);
+  var isOpen=now>=open&&now<=close;
+  var url=localStorage.getItem("bc_apparel_url")||"";
+  // Days until store opens
+  var daysUntil=Math.ceil((open-now)/(1000*60*60*24));
+  // Days until store closes
+  var daysLeft=Math.ceil((close-now)/(1000*60*60*24));
+
+  // Outside window entirely - show nothing
+  if(now>close) return null;
+
+  return R("div",{style:{background:"linear-gradient(135deg,#180E00,"+C.card+")",border:"1px solid "+C.gold+(isOpen?"88":"33"),borderRadius:14,padding:16,marginBottom:16,position:"relative",overflow:"hidden"}},
+    R("div",{style:{position:"absolute",left:0,top:0,bottom:0,width:3,background:isOpen?C.goldBright:C.goldDim}}),
+    R("div",{style:{paddingLeft:8}},
+      R("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:8}},
+        R(Icon,{n:"shirt",size:16,color:isOpen?C.goldBright:C.goldDim}),
+        R("div",{style:{fontSize:9,color:isOpen?C.goldBright:C.goldDim,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.3em",fontWeight:700}},"TEAM APPAREL")
+      ),
+      R("div",{style:{fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,marginBottom:4}},"BC Track and XC Store"),
+      isOpen
+        ? R("div",null,
+            R("div",{style:{fontSize:12,color:C.offWhite,fontFamily:"'Oswald',sans-serif",marginBottom:10}},"Store closes in "+daysLeft+" day"+(daysLeft===1?"":"s")+" - Aug 7th"),
+            url
+              ? R("button",{onClick:function(){window.open(url,"_blank");},style:{padding:"8px 18px",background:"linear-gradient(135deg,"+C.gold+","+C.goldBright+")",border:"none",borderRadius:8,color:C.black,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Oswald',sans-serif",letterSpacing:"0.1em"}},"SHOP NOW")
+              : R("div",{style:{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif",fontStyle:"italic"}},"Store link coming soon")
+          )
+        : R("div",null,
+            R("div",{style:{fontSize:12,color:C.muted,fontFamily:"'Oswald',sans-serif",marginBottom:6}},"Opens July 20th - August 7th"),
+            R("div",{style:{display:"flex",alignItems:"center",gap:8}},
+              R("div",{style:{fontSize:28,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldDim}},daysUntil),
+              R("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif"}},"days until store opens")
+            )
+          )
+    )
+  );
+}
+
+function ApparelSetting(){
+  var R=React.createElement;
+  var STORAGE_KEY="bc_apparel_url";
+  var _u=useState(localStorage.getItem(STORAGE_KEY)||"");var url=_u[0];var setUrl=_u[1];
+  var _e=useState(false);var editing=_e[0];var setEditing=_e[1];
+  var save=function(){localStorage.setItem(STORAGE_KEY,url);setEditing(false);};
+  return R("div",{style:{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:"14px 14px"}},
+    R("div",{style:{display:"flex",alignItems:"center",gap:12}},
+      R("div",{style:{width:40,height:40,borderRadius:10,background:C.goldBright+"18",border:"1px solid "+C.goldBright+"33",display:"flex",alignItems:"center",justifyContent:"center"}},R(Icon,{n:"shirt",size:18,color:C.goldBright})),
+      R("div",{style:{flex:1}},
+        R("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}},"BSN Apparel Store"),
+        R("div",{style:{fontSize:10,color:url?C.gold:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:2}},url?"URL set - tap OPEN to visit":"No URL set yet - add one below")
+      ),
+      url&&!editing&&R("button",{onClick:function(){window.open(url,"_blank");},style:{padding:"6px 10px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:8,color:C.goldBright,fontSize:10,fontFamily:"'Oswald',sans-serif",cursor:"pointer",marginRight:4}},"OPEN"),
+      R("button",{onClick:function(){setEditing(!editing);},style:{padding:"6px 10px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.muted,fontSize:10,fontFamily:"'Oswald',sans-serif",cursor:"pointer"}},editing?"CANCEL":"EDIT URL")
+    ),
+    editing&&R("div",{style:{marginTop:10,display:"flex",gap:8}},
+      R("input",{placeholder:"https://your-bsn-store-url.com",value:url,onChange:function(e){setUrl(e.target.value);},style:{flex:1,padding:"8px 10px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.white,fontFamily:"'Oswald',sans-serif",fontSize:12}}),
+      R("button",{onClick:save,style:{padding:"8px 14px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:8,color:C.goldBright,fontSize:12,fontFamily:"'Oswald',sans-serif",cursor:"pointer",fontWeight:700}},"SAVE")
+    )
+  );
+}
+
 function CoachTab(props){
   var athletes=props.athletes,meets=props.meets,workouts=props.workouts,results=props.results,records=props.records,onRefresh=props.onRefresh,onOpenTiming=props.onOpenTiming,logoUrl=props.logoUrl,setLogoUrl=props.setLogoUrl;
   var _a=useState(false);var auth=_a[0];var setAuth=_a[1];
@@ -1607,13 +1771,7 @@ function CoachTab(props){
         R("button",{onClick:function(){if(logoRef.current)logoRef.current.click();},style:{padding:"6px 12px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:8,color:C.goldBright,fontSize:11,fontFamily:"'Oswald',sans-serif",cursor:"pointer"}},logoUp?"...":"UPLOAD")
       )
     ),
-    R("div",{style:{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:"14px 14px"}},
-      R("div",{style:{display:"flex",alignItems:"center",gap:12}},
-        R("div",{style:{width:40,height:40,borderRadius:10,background:C.goldBright+"18",border:"1px solid "+C.goldBright+"33",display:"flex",alignItems:"center",justifyContent:"center"}},R(Icon,{n:"shirt",size:18,color:C.goldBright})),
-        R("div",{style:{flex:1}},R("div",{style:{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}},"BSN Apparel Store"),R("div",{style:{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:2}},"Official team gear link")),
-        R("button",{onClick:function(){window.open("https://bsnsports.com","_blank");},style:{padding:"6px 12px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:8,color:C.goldBright,fontSize:11,fontFamily:"'Oswald',sans-serif",cursor:"pointer"}},"OPEN")
-      )
-    )
+    R(ApparelSetting,null)
   );
 }
 
