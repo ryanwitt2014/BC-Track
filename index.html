@@ -23,7 +23,7 @@ select option{background:#111;color:#F4F4F0;}
 <div id="root"></div>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.23.10/babel.min.js"></script>
 <script type="text/babel">
 const {useState,useEffect,useRef,useCallback} = React;
 
@@ -113,7 +113,7 @@ const calcGoal = (a,evKey) => {
   return null;
 };
 const calcProjections = (athlete,results,meets) => {
-  const mr=results.filter(r=>r.athlete_id===athlete.id&&r.time&&!r.time.includes("_split")).map(r=>({...r,meet:meets.find(m=>m.id===r.meet_id)})).sort((a,b)=>new Date(a.meet?.date||0)-new Date(b.meet?.date||0));
+  const mr=results.filter(r=>r.athlete_id===athlete.id&&r.time&&!r.time.includes("_split")).map(r=>({...r,meet:meets.find(m=>m.id===r.meet_id)})).sort((a,b)=>new Date((a.meet&&a.meet.date)||0)-new Date((b.meet&&b.meet.date)||0));
   if(mr.length<3) return null;
   const allTimes=mr.map(r=>t2s(r.time)).filter(t=>t<9999);
   if(allTimes.length<3) return null;
@@ -271,7 +271,7 @@ function LiveTiming({athletes,meets,onClose}){
     const atGoal=gs?gs*(cp.dist/cp.total)*1000:null;const status=!atGoal?"on":ms-atGoal<-1500?"ahead":"on";
     const isF=cp.id==="finish";let place=null;if(isF){place=finCount+1;setFinCount(c=>c+1);}
     setAdMap(prev=>({...prev,[a.id]:{...prev[a.id],splits:[...prev[a.id].splits,{cpId:cp.id,label:cp.label,ms,timeStr:ms2t(ms),projMs,status}],done:isF,place}}));
-    const name=a.short_name||a.name;const mn=meets.find(m=>m.id===meetId)?.name||"Today";const gs2=gs?s2t(gs):"--";
+    const name=a.short_name||a.name;const mn=meets.find(m=>m.id===meetId)&&meets.find(function(mm){return mm.id===meetId;}).name||"Today";const gs2=gs?s2t(gs):"--";
     if(isF){const met=gs&&(ms/1000)<=gs*1.01;notify(name+" finished "+ev.short+" in "+ms2t(ms)+" at "+mn+". Goal: "+gs2+(met?". GOAL MET!":"."),met?"success":"alert");}
     else notify(name+" - "+cp.label+": "+ms2t(ms)+" | Proj: "+s2t(projMs/1000)+(status==="ahead"?" | AHEAD":""),status==="ahead"?"success":"info");
   };
@@ -317,7 +317,7 @@ function LiveTiming({athletes,meets,onClose}){
       <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(to right,"+C.goldDim+","+C.goldBright+","+C.goldDim+")"}}/>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
         <button onClick={()=>{setRunning(false);setPhase("setup");setAdMap({});setFinCount(0);setSaved(false);}} style={{background:"none",border:"none",cursor:"pointer"}}><Icon n="back" size={20} color={C.muted}/></button>
-        <div style={{flex:1}}><div style={{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em"}}>{ev.label.toUpperCase()}</div><div style={{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}}>{meets.find(m=>m.id===meetId)?.name||"Live Race"}</div></div>
+        <div style={{flex:1}}><div style={{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.2em"}}>{ev.label.toUpperCase()}</div><div style={{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}}>{meets.find(m=>m.id===meetId)&&meets.find(function(mm){return mm.id===meetId;}).name||"Live Race"}</div></div>
         <div style={{fontSize:9,color:C.goldBright,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.15em"}}>{finCount} FINISHED</div>
       </div>
       <div style={{textAlign:"center",marginBottom:10}}>
@@ -485,22 +485,22 @@ function useMeetRecap(meet, athletes, results) {
         const meetResults = results.filter(r => r.meet_id === meet.id && r.time && !r.time.includes("_split"))
           .map(r => ({...r, athlete: athletes.find(a => a.id === r.athlete_id)}))
           .sort((a,b) => (a.place||99)-(b.place||99));
-        const topBoys = meetResults.filter(r=>r.athlete?.gender==="boys").slice(0,5);
-        const topGirls = meetResults.filter(r=>r.athlete?.gender==="girls").slice(0,5);
-        const prompt = "Write a 3-sentence school announcement about a cross country meet result. Tone: excited, school pride, mention specific athletes by first and last name. Meet: "+meet.name+" on "+meet.date+(meet.location?" at "+meet.location:"")+". Boys finished "+( meet.boys_place?"in "+meet.boys_place+(meet.boys_place===1?"st":meet.boys_place===2?"nd":meet.boys_place===3?"rd":"th")+" place"+(meet.boys_points?" with "+meet.boys_points+" points":""):"did not have team score recorded")+". Girls finished "+(meet.girls_place?"in "+meet.girls_place+(meet.girls_place===1?"st":meet.girls_place===2?"nd":meet.girls_place===3?"rd":"th")+" place"+(meet.girls_points?" with "+meet.girls_points+" points":""):"did not have team score recorded")+". Top boys finishers: "+topBoys.map(r=>r.athlete?.name+" ("+r.time+", #"+r.place+")").join(", ")+". Top girls finishers: "+topGirls.map(r=>r.athlete?.name+" ("+r.time+", #"+r.place+")").join(", ")+". School name: Benton Central. Team nickname: The Herd. Keep it under 100 words. Do not use quotes around the text. Just write the announcement directly.";
+        const topBoys = meetResults.filter(r=>(r.athlete&&r.athlete.gender)==="boys").slice(0,5);
+        const topGirls = meetResults.filter(r=>(r.athlete&&r.athlete.gender)==="girls").slice(0,5);
+        const prompt = "Write a 3-sentence school announcement about a cross country meet result. Tone: excited, school pride, mention specific athletes by first and last name. Meet: "+meet.name+" on "+meet.date+(meet.location?" at "+meet.location:"")+". Boys finished "+( meet.boys_place?"in "+meet.boys_place+(meet.boys_place===1?"st":meet.boys_place===2?"nd":meet.boys_place===3?"rd":"th")+" place"+(meet.boys_points?" with "+meet.boys_points+" points":""):"did not have team score recorded")+". Girls finished "+(meet.girls_place?"in "+meet.girls_place+(meet.girls_place===1?"st":meet.girls_place===2?"nd":meet.girls_place===3?"rd":"th")+" place"+(meet.girls_points?" with "+meet.girls_points+" points":""):"did not have team score recorded")+". Top boys finishers: "+topBoys.map(r=>(r.athlete&&r.athlete.name)+" ("+r.time+", #"+r.place+")").join(", ")+". Top girls finishers: "+topGirls.map(r=>(r.athlete&&r.athlete.name)+" ("+r.time+", #"+r.place+")").join(", ")+". School name: Benton Central. Team nickname: The Herd. Keep it under 100 words. Do not use quotes around the text. Just write the announcement directly.";
         const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
           headers: {"Content-Type":"application/json","Authorization":"Bearer "+GROQ_KEY},
           body: JSON.stringify({model:"llama3-8b-8192",messages:[{role:"user",content:prompt}],max_tokens:200,temperature:0.7})
         });
         const d = await resp.json();
-        const text = d.choices?.[0]?.message?.content || "";
+        const text = (d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content) || "";
         setRecap(text);
       } catch(e) { setRecap(null); }
       setLoading(false);
     };
     genRecap();
-  }, [meet?.id]);
+  }, [(meet&&meet.id)]);
   return {recap, loading};
 }
 
@@ -570,7 +570,7 @@ function MeetRecapCard({meet, athletes, results, onViewAthlete}) {
 function MyAthleteCard({athlete, meets, results, onView}) {
   const next = meets.find(m=>m.status==="next");
   const goalSec = next ? calcGoal(athlete, "3K XC") : null;
-  const weather = useWeather(next?.city, next?.date);
+  const weather = useWeather((next&&next.city), (next&&next.date));
   const [showAlertInput, setShowAlertInput] = useState(false);
   const [phone, setPhone] = useState(athlete.parent_phone||"");
   const [saving, setSaving] = useState(false);
@@ -711,7 +711,7 @@ function AthletesTab({athletes,onView,favIds,onToggleFav}){
 function AthleteProfile({athlete,results,meets,onBack,isFav,onToggleFav}){
   const [sub,setSub]=useState("overview");const a=athlete;const paces=calcPaces(a.pr_baseline||a.pr_3k);
   const allR=results.filter(r=>r.athlete_id===a.id);
-  const myR=allR.filter(r=>r.time&&!r.time.includes("_split")).map(r=>({...r,meet:meets.find(m=>m.id===r.meet_id)})).sort((x,y)=>new Date(x.meet?.date||0)-new Date(y.meet?.date||0));
+  const myR=allR.filter(r=>r.time&&!r.time.includes("_split")).map(r=>({...r,meet:meets.find(m=>m.id===r.meet_id)})).sort((x,y)=>new Date((x.meet&&x.meet.date)||0)-new Date((y.meet&&y.meet.date)||0));
   const proj=calcProjections(a,results,meets);
   const age={6:11,7:12,8:13,9:14,10:15,11:16,12:17}[a.grade]||(a.grade+5);
   return <div style={{display:"flex",flexDirection:"column",height:"100%"}}>
@@ -753,13 +753,13 @@ function AthleteProfile({athlete,results,meets,onBack,isFav,onToggleFav}){
         <div style={{fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em",marginBottom:14}}>RESULTS WITH GOALS</div>
         {myR.length===0?<div style={{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:24,textAlign:"center"}}><div style={{fontSize:13,color:C.muted,fontFamily:"'Oswald',sans-serif"}}>No results yet</div></div>
         :myR.map((r,i)=>{
-          const spl=allR.find(x=>x.time===r.time+"_split"&&x.athlete_id===a.id);const notes=spl?.notes||"";const mm=notes.match(/1 Mile Split:\s*([\d:\.]+)/);const mstr=mm?mm[1]:null;
+          const spl=allR.find(x=>x.time===r.time+"_split"&&x.athlete_id===a.id);const notes=(spl&&spl.notes)||"";const mm=notes.match(/1 Mile Split:\s*([\d:\.]+)/);const mstr=mm?mm[1]:null;
           let analysis=null;if(mstr&&r.time){const ms=t2s(mstr.split(".")[0]);const ts=t2s(r.time);if(ms<9999&&ts<9999)analysis={mile1:ms,seg2:(ts-ms)/0.864,total:ts/1.864};}
           const metGoal=r.goal_time&&r.time?t2s(r.time)<=t2s(r.goal_time)*1.005:null;
           return <div key={r.id} style={{background:C.card,border:"1px solid "+(metGoal===true?C.goldBright+"44":metGoal===false?C.red+"22":C.cardBorder),borderRadius:14,padding:"14px 16px",marginBottom:12}}>
             <div style={{display:"flex",alignItems:"center",marginBottom:r.goal_time||analysis?10:0}}>
               <div style={{width:32,height:32,borderRadius:8,background:C.gold+"22",border:"1px solid "+C.gold+"44",display:"flex",alignItems:"center",justifyContent:"center",marginRight:12}}><div style={{fontSize:12,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright}}>{r.place?"#"+r.place:"--"}</div></div>
-              <div style={{flex:1}}><div style={{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}}>{r.meet?.name||"Meet"}</div><div style={{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:2}}>{r.meet?.date||""}</div></div>
+              <div style={{flex:1}}><div style={{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}}>{r.(meet&&meet.name)||"Meet"}</div><div style={{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:2}}>{r.(meet&&meet.date)||""}</div></div>
               <div style={{textAlign:"right"}}><div style={{fontSize:20,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:i===myR.length-1?C.goldBright:C.white}}>{r.time}</div>{i>0&&(()=>{const diff=t2s(r.time)-t2s(myR[i-1].time);return <div style={{fontSize:10,color:diff<0?C.greenLight:C.red,fontFamily:"'Oswald',sans-serif"}}>{diff<0?"up "+Math.abs(diff)+"s":"dn "+Math.abs(diff)+"s"}</div>;})()}</div>
             </div>
             {r.goal_time&&<div style={{display:"flex",alignItems:"center",gap:8,padding:"6px 10px",background:(metGoal?C.goldBright:C.red)+"15",border:"1px solid "+(metGoal?C.goldBright:C.red)+"33",borderRadius:8,marginBottom:analysis?8:0}}><div style={{fontSize:11,color:C.muted,fontFamily:"'Oswald',sans-serif"}}>Goal: {r.goal_time}</div><div style={{flex:1}}/><div style={{fontSize:11,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:metGoal?C.goldBright:C.red}}>{metGoal?"GOAL MET":"GOAL MISSED"}</div></div>}
@@ -814,7 +814,7 @@ function TrainTab({workouts,athletes}){
   return <div style={{padding:"20px 16px"}}>
     <div style={{marginBottom:16}}><div style={{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em"}}>THIS WEEK</div><div style={{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}}>TRAINING</div></div>
     <div style={{display:"flex",gap:6,marginBottom:16,overflowX:"auto",paddingBottom:4}}>
-      {DAYS.map(d=>{const w=sorted.find(x=>x.day===d);const isT=d===td;const dot=w?.type==="hard"?C.red:w?.type==="meet"?C.goldBright:w?.type==="rest"?C.muted:"#3A7D40";return <button key={d} onClick={()=>setExp(exp===d?null:d)} style={{flexShrink:0,width:44,padding:"10px 0",background:exp===d?"linear-gradient(135deg,#1A1000,"+C.card+")":C.card,border:"1px solid "+(exp===d?C.goldBright:isT?C.gold+"55":C.cardBorder),borderRadius:10,cursor:"pointer",textAlign:"center",position:"relative"}}>
+      {DAYS.map(d=>{const w=sorted.find(x=>x.day===d);const isT=d===td;const dot=(w&&w.type)==="hard"?C.red:(w&&w.type)==="meet"?C.goldBright:(w&&w.type)==="rest"?C.muted:"#3A7D40";return <button key={d} onClick={()=>setExp(exp===d?null:d)} style={{flexShrink:0,width:44,padding:"10px 0",background:exp===d?"linear-gradient(135deg,#1A1000,"+C.card+")":C.card,border:"1px solid "+(exp===d?C.goldBright:isT?C.gold+"55":C.cardBorder),borderRadius:10,cursor:"pointer",textAlign:"center",position:"relative"}}>
         {isT&&<div style={{position:"absolute",top:4,right:4,width:5,height:5,borderRadius:"50%",background:C.goldBright}}/>}
         <div style={{fontSize:9,color:isT?C.goldBright:C.muted,fontFamily:"'Oswald',sans-serif",fontWeight:700,marginBottom:4}}>{d}</div>
         <div style={{width:8,height:8,borderRadius:"50%",background:w?dot:C.subtle,margin:"0 auto"}}/>
@@ -851,13 +851,13 @@ function RecordsTab({records}){
   const [gender,setGender]=useState("boys");const myEv=RECORD_EVENTS.filter(e=>e.gender===gender);
   const getRecs=id=>records.filter(r=>r.event_id===id).sort((a,b)=>a.mark_sortable-b.mark_sortable);
   const xcIds={boys:["xc_3k_6b","xc_3k_7b","xc_3k_8b"],girls:["xc_3k_6g","xc_3k_7g","xc_3k_8g"]};
-  const fastestXC=g=>{const times=xcIds[g].map(id=>{const r=getRecs(id);return r[0]?.mark_sortable;}).filter(Boolean);return times.length>0?Math.min(...times):null;};
+  const fastestXC=g=>{const times=xcIds[g].map(id=>{const r=getRecs(id);return (r[0]&&r[0].mark_sortable);}).filter(Boolean);return times.length>0?Math.min(...times):null;};
   const fxcB=fastestXC("boys");const fxcG=fastestXC("girls");
   return <div style={{padding:"20px 16px"}}>
     <div style={{marginBottom:16}}><div style={{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em"}}>PROGRAM HISTORY</div><div style={{fontSize:26,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}}>RECORDS</div></div>
     <div style={{display:"flex",background:C.card,borderRadius:10,padding:3,border:"1px solid "+C.cardBorder,marginBottom:16}}>{["boys","girls"].map(g=><button key={g} onClick={()=>setGender(g)} style={{flex:1,padding:"9px 0",background:gender===g?"linear-gradient(135deg,#1A1000,#2A1800)":"transparent",border:"none",borderRadius:8,color:gender===g?C.goldBright:C.muted,fontSize:12,cursor:"pointer",fontWeight:gender===g?700:400}}>{g.toUpperCase()}</button>)}</div>
     {myEv.map(ev=>{
-      const recs=getRecs(ev.id);const fxc=gender==="boys"?fxcB:fxcG;const isFastest=ev.id.startsWith("xc_3k")&&recs[0]?.mark_sortable===fxc;
+      const recs=getRecs(ev.id);const fxc=gender==="boys"?fxcB:fxcG;const isFastest=ev.id.startsWith("xc_3k")&&(recs[0]&&recs[0].mark_sortable)===fxc;
       return <div key={ev.id} style={{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:"14px 14px",marginBottom:8}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:recs.length>0?8:0}}>
           <div style={{fontSize:13,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}}>{ev.label}</div>
@@ -978,7 +978,7 @@ function MeetEditor({meets,onBack,onRefresh,showMsg}){
     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}><button onClick={onBack} style={{background:"none",border:"none",cursor:"pointer"}}><Icon n="back" size={22} color={C.muted}/></button><div style={{flex:1}}><div style={{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",letterSpacing:"0.25em"}}>COACH PORTAL</div><div style={{fontSize:22,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}}>MEET SCHEDULE</div></div><button onClick={()=>{setForm({status:"upcoming"});setView("add");}} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 14px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:10,color:C.goldBright,fontSize:12,fontWeight:700,cursor:"pointer"}}><Icon n="plus" size={14} color={C.goldBright}/> ADD</button></div>
     {meets.map(m=><div key={m.id} style={{display:"flex",alignItems:"center",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:"12px 14px",marginBottom:8}}>
       <div style={{flex:1}}><div style={{fontSize:14,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}}>{m.name}{m.section?" - "+m.section:""}</div><div style={{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif",marginTop:2}}>{m.date}{m.location?" - "+m.location:""}</div>{m.bus_time&&<div style={{fontSize:10,color:C.gold,fontFamily:"'Oswald',sans-serif"}}>Bus: {m.bus_time}</div>}</div>
-      <div style={{padding:"3px 8px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:6,fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",marginRight:8}}>{m.status?.toUpperCase()}</div>
+      <div style={{padding:"3px 8px",background:C.subtle,border:"1px solid "+C.cardBorder,borderRadius:6,fontSize:9,color:C.muted,fontFamily:"'Oswald',sans-serif",marginRight:8}}>{m.(status&&status.toUpperCase)()}</div>
       <button onClick={()=>{setForm({...m});setView("edit");}} style={{width:34,height:34,borderRadius:8,background:C.subtle,border:"1px solid "+C.cardBorder,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><Icon n="edit" size={15} color={C.muted}/></button>
           <PhotoUploadBtn meet={m} onRefresh={onRefresh}/>
         </div>)}
@@ -1037,12 +1037,12 @@ function ResultEditor({athletes,meets,results,onBack,onRefresh,showMsg}){
       {mr.length===0?<div style={{background:C.card,border:"1px solid "+C.cardBorder,borderRadius:12,padding:20,textAlign:"center"}}><div style={{fontSize:13,color:C.muted,fontFamily:"'Oswald',sans-serif"}}>No results for this meet</div></div>
       :mr.map(r=><div key={r.id} style={{background:C.card,border:"1px solid "+(editId===r.id?C.goldBright:C.cardBorder),borderRadius:12,padding:"12px 14px",marginBottom:8}}>
         {editId===r.id?<div>
-          <div style={{fontSize:12,color:C.goldBright,fontFamily:"'Oswald',sans-serif",marginBottom:8}}>{r.athlete?.name||"Athlete"}</div>
+          <div style={{fontSize:12,color:C.goldBright,fontFamily:"'Oswald',sans-serif",marginBottom:8}}>{(r.athlete&&r.athlete.name)||"Athlete"}</div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:8}}><input placeholder="Time" value={form.time||""} onChange={e=>setForm({...form,time:e.target.value})} style={inp({padding:"8px 10px"})}/><input placeholder="Place" value={form.place||""} onChange={e=>setForm({...form,place:e.target.value})} style={inp({padding:"8px 10px"})} type="number"/><input placeholder="Goal" value={form.goal_time||""} onChange={e=>setForm({...form,goal_time:e.target.value})} style={inp({padding:"8px 10px"})}/></div>
           <div style={{display:"flex",gap:8}}><button onClick={saveEdit} disabled={loading} style={{flex:1,padding:"9px",background:"linear-gradient(135deg,#1A1000,#2A1800)",border:"1px solid "+C.goldBright,borderRadius:8,color:C.goldBright,fontSize:13,fontWeight:700,cursor:"pointer"}}>{loading?"...":"SAVE"}</button><button onClick={()=>{setEditId(null);setForm({});}} style={{padding:"9px 16px",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:8,color:C.muted,fontSize:13,cursor:"pointer"}}>CANCEL</button></div>
         </div>:<div style={{display:"flex",alignItems:"center"}}>
           <Avatar athlete={r.athlete} size={32}/>
-          <div style={{flex:1,marginLeft:10}}><div style={{fontSize:13,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}}>{r.athlete?.name||"Unknown"}</div><div style={{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif"}}>{r.place?"#"+r.place+" - ":""}{r.time}{r.goal_time?" | Goal: "+r.goal_time:""}</div></div>
+          <div style={{flex:1,marginLeft:10}}><div style={{fontSize:13,fontFamily:"'Oswald',sans-serif",fontWeight:600,color:C.white}}>{(r.athlete&&r.athlete.name)||"Unknown"}</div><div style={{fontSize:10,color:C.muted,fontFamily:"'Oswald',sans-serif"}}>{r.place?"#"+r.place+" - ":""}{r.time}{r.goal_time?" | Goal: "+r.goal_time:""}</div></div>
           <button onClick={()=>{setEditId(r.id);setForm({time:r.time,place:r.place||"",goal_time:r.goal_time||"",athlete_id:r.athlete_id});}} style={{width:32,height:32,borderRadius:8,background:C.subtle,border:"1px solid "+C.cardBorder,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><Icon n="edit" size={14} color={C.muted}/></button>
         </div>}
       </div>)}
@@ -1090,9 +1090,9 @@ function RosterManager({athletes,onBack,onRefresh,showMsg}){
   const auto=n=>{if(!n)return"";const p=n.trim().split(" ");return p[0]+" "+p[p.length-1][0]+".";};
   const handlePhoto=async e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=ev=>setPhotoPreview(ev.target.result);rd.readAsDataURL(f);if(sv==="edit"&&form.id){setUploading(true);const url=await db.uploadPhoto(form.id,f);if(url){await db.patch("athletes",form.id,{photo_url:url});setForm(x=>({...x,photo_url:url}));showMsg("Photo uploaded!");}setUploading(false);}else setForm(x=>({...x,_photoFile:f}));};
   const saveEdit=async()=>{if(!form.id)return;setLoading(true);await db.patch("athletes",form.id,{name:form.name.trim(),short_name:form.short_name||auto(form.name),grade:parseInt(form.grade),gender:form.gender,pr_3k:form.pr_3k||null,pr_5k:form.pr_5k||null,pr_1600:form.pr_1600||null,pr_800:form.pr_800||null,pr_baseline:form.pr_baseline||null,attendance:parseInt(form.attendance)||100,weekly_mileage:parseInt(form.weekly_mileage)||0,parent_phone:form.parent_phone||null,badge:form.badge||null});setLoading(false);setForm({});setSv("list");onRefresh();showMsg("Updated!");};
-  const saveAdd=async()=>{if(!form.name)return;setLoading(true);const res=await db.post("athletes",{name:form.name.trim(),short_name:form.short_name||auto(form.name),grade:parseInt(form.grade)||9,gender:form.gender||"boys",pr_3k:form.pr_3k||null,pr_5k:form.pr_5k||null,pr_1600:form.pr_1600||null,pr_800:form.pr_800||null,pr_baseline:form.pr_baseline||null,attendance:parseInt(form.attendance)||100,weekly_mileage:parseInt(form.weekly_mileage)||0,parent_phone:form.parent_phone||null,badge:form.badge||null,active:true});const nid=Array.isArray(res)?res[0]?.id:res?.id;if(nid&&form._photoFile){const url=await db.uploadPhoto(nid,form._photoFile);if(url)await db.patch("athletes",nid,{photo_url:url});}setLoading(false);setForm({});setSv("list");onRefresh();showMsg(form.name+" added!");};
+  const saveAdd=async()=>{if(!form.name)return;setLoading(true);const res=await db.post("athletes",{name:form.name.trim(),short_name:form.short_name||auto(form.name),grade:parseInt(form.grade)||9,gender:form.gender||"boys",pr_3k:form.pr_3k||null,pr_5k:form.pr_5k||null,pr_1600:form.pr_1600||null,pr_800:form.pr_800||null,pr_baseline:form.pr_baseline||null,attendance:parseInt(form.attendance)||100,weekly_mileage:parseInt(form.weekly_mileage)||0,parent_phone:form.parent_phone||null,badge:form.badge||null,active:true});const nid=Array.isArray(res)?(res[0]&&res[0].id):(res&&res.id);if(nid&&form._photoFile){const url=await db.uploadPhoto(nid,form._photoFile);if(url)await db.patch("athletes",nid,{photo_url:url});}setLoading(false);setForm({});setSv("list");onRefresh();showMsg(form.name+" added!");};
   const doRem=async()=>{setLoading(true);await db.patch("athletes",confirmA.id,{active:false});setLoading(false);setConfirmA(null);setSv("list");onRefresh();showMsg(confirmA.name+" removed.");};
-  if(sv==="confirm_remove") return <div style={{padding:"20px 16px"}}><div style={{display:"flex",alignItems:"center",gap:10,marginBottom:24}}><button onClick={()=>setSv("list")} style={{background:"none",border:"none",cursor:"pointer"}}><Icon n="back" size={22} color={C.muted}/></button><div style={{fontSize:20,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}}>REMOVE ATHLETE</div></div><div style={{background:C.red+"18",border:"1px solid "+C.red+"44",borderRadius:14,padding:20,marginBottom:20,textAlign:"center"}}><div style={{width:52,height:52,borderRadius:14,background:"#1A1A1A",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright,margin:"0 auto 12px"}}>{initials(confirmA?.name||"")}</div><div style={{fontSize:18,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,marginBottom:6}}>{confirmA?.name}</div><div style={{fontSize:13,color:C.offWhite,fontFamily:"'Oswald',sans-serif",lineHeight:1.6}}>Removes from roster. Results and history are preserved.</div></div><button onClick={doRem} disabled={loading} style={{width:"100%",padding:"13px",background:"#8B1A1A",border:"none",borderRadius:10,color:C.white,fontSize:14,fontWeight:700,cursor:"pointer",marginBottom:10}}>{loading?"REMOVING...":"YES, REMOVE"}</button><button onClick={()=>setSv("list")} style={{width:"100%",padding:"13px",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:10,color:C.muted,fontSize:14,cursor:"pointer"}}>CANCEL</button></div>;
+  if(sv==="confirm_remove") return <div style={{padding:"20px 16px"}}><div style={{display:"flex",alignItems:"center",gap:10,marginBottom:24}}><button onClick={()=>setSv("list")} style={{background:"none",border:"none",cursor:"pointer"}}><Icon n="back" size={22} color={C.muted}/></button><div style={{fontSize:20,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}}>REMOVE ATHLETE</div></div><div style={{background:C.red+"18",border:"1px solid "+C.red+"44",borderRadius:14,padding:20,marginBottom:20,textAlign:"center"}}><div style={{width:52,height:52,borderRadius:14,background:"#1A1A1A",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.goldBright,margin:"0 auto 12px"}}>{initials((confirmA&&confirmA.name)||"")}</div><div style={{fontSize:18,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white,marginBottom:6}}>{(confirmA&&confirmA.name)}</div><div style={{fontSize:13,color:C.offWhite,fontFamily:"'Oswald',sans-serif",lineHeight:1.6}}>Removes from roster. Results and history are preserved.</div></div><button onClick={doRem} disabled={loading} style={{width:"100%",padding:"13px",background:"#8B1A1A",border:"none",borderRadius:10,color:C.white,fontSize:14,fontWeight:700,cursor:"pointer",marginBottom:10}}>{loading?"REMOVING...":"YES, REMOVE"}</button><button onClick={()=>setSv("list")} style={{width:"100%",padding:"13px",background:C.card,border:"1px solid "+C.cardBorder,borderRadius:10,color:C.muted,fontSize:14,cursor:"pointer"}}>CANCEL</button></div>;
   if(sv==="add"||sv==="edit"){const isE=sv==="edit";return <div style={{padding:"20px 16px"}}>
     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:20}}><button onClick={()=>{setSv("list");setPhotoPreview(null);}} style={{background:"none",border:"none",cursor:"pointer"}}><Icon n="back" size={22} color={C.muted}/></button><div style={{fontSize:20,fontFamily:"'Oswald',sans-serif",fontWeight:700,color:C.white}}>{isE?"EDIT":"ADD ATHLETE"}</div></div>
     <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:20}}>
@@ -1228,4 +1228,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(
 </script>
 </body>
 </html>
+
 
